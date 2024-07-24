@@ -39,11 +39,17 @@ const StyledCounterButton = styled.button`
 export interface CounterButtonProps {
   icon?: ReactNode;
   disabled?: boolean;
+  onClick?: () => void;
 }
 
 export const CounterButtonComponent = ({
   icon,
   disabled,
+  onClick,
 }: CounterButtonProps) => {
-  return <StyledCounterButton disabled={disabled}>{icon}</StyledCounterButton>;
+  return (
+    <StyledCounterButton disabled={disabled} onClick={onClick}>
+      {icon}
+    </StyledCounterButton>
+  );
 };
