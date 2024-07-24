@@ -9,6 +9,7 @@ import { ButtonComponent } from '../components/Buttons/ButtonComponent.tsx';
 import Undo from '../assets/icons/Undo.svg';
 import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
+import { IProduct } from "../types.ts";
 
 const StyledProductPage = styled.div`
   display: flex;
@@ -153,12 +154,12 @@ export const ProductPage = () => {
       <StyledLinkButtonWrapper>
         <LinkButtonComponent variant={'brand'} onClick={handleGoBack} />
       </StyledLinkButtonWrapper>
-      {isLoading ?? (
+      {isLoading && (
         <StyledInfoCard>
           <StyledTitle>Загрузка...</StyledTitle>
         </StyledInfoCard>
       )}
-      {data ?? (
+      {data && (
         <StyledCardsContainer>
           <StyledInfoCard>
             <StyledPicture src={data.picture} alt={data.title} />
@@ -201,7 +202,7 @@ export const ProductPage = () => {
           </StyledDescriptionCard>
         </StyledCardsContainer>
       )}
-      {error ?? (
+      {error && (
         <StyledInfoCard>
           <StyledTitle>404: Товар не найден</StyledTitle>
         </StyledInfoCard>
