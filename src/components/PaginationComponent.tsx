@@ -29,7 +29,7 @@ export const PaginationComponent = ({
 
   const handlePageChange = (newPage) => {
     params.set('page', newPage);
-    navigate(`${location.pathname}?${params.toString()}`);
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
   useEffect(() => {
