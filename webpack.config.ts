@@ -7,10 +7,7 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-<<<<<<< HEAD
     publicPath: '/',
-=======
->>>>>>> origin/initial-setup
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -50,11 +47,7 @@ module.exports = {
     new CleanWebpackPlugin(),
   ],
   devServer: {
-<<<<<<< HEAD
     static: path.join(__dirname, 'public'),
-=======
-    static: path.join(__dirname, 'dist'),
->>>>>>> origin/initial-setup
     compress: true,
     port: 3000,
     historyApiFallback: true,
