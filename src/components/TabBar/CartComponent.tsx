@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { colors } from '../../styles/colors.ts';
 import { TrashIconComponent } from '../Icons/TrashIconComponent.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store.ts';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -43,10 +45,14 @@ export interface TabBarLinkProps {
 }
 
 export const CartComponent = () => {
+  const cart = useSelector((state: RootState) => state.cartReducer.cart);
+
   return (
     <StyledContainer>
       <TrashIconComponent />
-      <StyledText>Корзина (2)</StyledText>
+      <StyledText>
+        Корзина ({cart.reduce((acc, order) => acc + order.quantity, 0)})
+      </StyledText>
     </StyledContainer>
   );
 };

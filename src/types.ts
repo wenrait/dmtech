@@ -34,3 +34,9 @@ export interface IProductsRes {
   meta: IMetaData;
   data: IProduct[];
 }
+
+export interface IOrderInfo {
+  product: IProduct;
+  quantity: number;
+  creditedAt: string;
+}

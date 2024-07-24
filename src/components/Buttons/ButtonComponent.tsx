@@ -15,6 +15,8 @@ const StyledButton = styled.button`
   transition: 120ms;
   cursor: pointer;
 
+  flex: 1;
+
   &:not(:disabled):hover {
     background: rgb(52, 143, 231);
   }
@@ -32,8 +34,13 @@ const StyledButton = styled.button`
 export interface ButtonProps {
   text: string;
   disabled?: boolean;
+  onClick?: () => void;
 }
 
-export const ButtonComponent = ({ text, disabled }: ButtonProps) => {
-  return <StyledButton disabled={disabled}>{text}</StyledButton>;
+export const ButtonComponent = ({ text, disabled, onClick }: ButtonProps) => {
+  return (
+    <StyledButton disabled={disabled} onClick={onClick}>
+      {text}
+    </StyledButton>
+  );
 };

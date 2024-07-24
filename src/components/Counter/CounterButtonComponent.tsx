@@ -53,15 +53,21 @@ export interface CounterButtonProps {
   icon: ReactNode;
   disabled?: boolean;
   $function: 'decrease' | 'increase';
+  onClick?: () => void;
 }
 
 export const CounterButtonComponent = ({
   icon,
   disabled,
   $function,
+  onClick,
 }: CounterButtonProps) => {
   return (
-    <StyledCounterButton disabled={disabled} $function={$function}>
+    <StyledCounterButton
+      disabled={disabled}
+      $function={$function}
+      onClick={onClick}
+    >
       {icon}
     </StyledCounterButton>
   );

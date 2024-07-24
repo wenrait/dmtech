@@ -2,14 +2,16 @@ import { useGetProductQuery } from '../../redux/services/api/productsApi.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LinkButtonComponent } from '../components/Buttons/LinkButtonComponent.tsx';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store.ts';
+import { RootState, useAppDispatch } from '../../redux/store.ts';
 import styled, { css } from 'styled-components';
 import { RatingComponent } from '../components/RatingComponent.tsx';
 import { ButtonComponent } from '../components/Buttons/ButtonComponent.tsx';
 import Undo from '../assets/icons/Undo.svg';
 import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
-import { IProduct } from "../types.ts";
+import { addNewProduct } from '../../redux/slices/cartSlice.ts';
+import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
+import { IOrderInfo, IProduct } from '../types.ts';
 
 const StyledProductPage = styled.div`
   display: flex;
@@ -101,6 +103,7 @@ const StyledReturnTitle = styled.div`
   align-items: center;
   font-size: 16px;
   font-weight: 700;
+  gap: 8px;
 `;
 
 const StyledReturnText = styled.span`
@@ -132,21 +135,36 @@ const StyledDescription = styled.div`
   }
 `;
 
+const StyledCounterWrapper = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
 export const ProductPage = () => {
+  const dispatch = useAppDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
   const { limit, page } = useSelector(
     (state: RootState) => state.paginationReducer,
   );
 
-  const { data, isLoading, error } = useGetProductQuery({ id });
+  const order = useSelector((state: RootState) =>
+    state.cartReducer.cart.find((order) => order.product.id === id),
+  );
 
-  if (data) {
-    console.log(data);
-  }
+  const { data, isLoading, error } = useGetProductQuery({ id });
 
   const handleGoBack = () => {
     navigate(`/products?limit=${limit}&page=${page}`);
+  };
+
+  const handleAddToCart = (data: IProduct) => {
+    const payload: IOrderInfo = {
+      product: data,
+      quantity: 1,
+      creditedAt: Date.now().toString(),
+    };
+    dispatch(addNewProduct(payload));
   };
 
   return (
@@ -172,9 +190,19 @@ export const ProductPage = () => {
               </StyledInfoBlock>
               <StyledInfoBlock>
                 <StyledPrice>{data.price} ₽</StyledPrice>
-                <StyledComponentWrapper>
-                  <ButtonComponent text={'Добавить в корзину'} />
-                </StyledComponentWrapper>
+                {!order ? (
+                  <StyledComponentWrapper>
+                    <ButtonComponent
+                      text={'Добавить в корзину'}
+                      onClick={() => handleAddToCart(data)}
+                    />
+                  </StyledComponentWrapper>
+                ) : (
+                  <StyledCounterWrapper>
+                    <CounterComponent id={id} />
+                    <ButtonComponent text={'Оформить заказ'} />
+                  </StyledCounterWrapper>
+                )}
               </StyledInfoBlock>
               <StyledReturn>
                 <StyledReturnTitle>

@@ -32,7 +32,6 @@ export const BarComponent = () => {
       <StyledNav>
         <TabBarLinkComponent text={'Товары'} to={'/products?limit=10&page=1'} />
         <TabBarLinkComponent text={'Заказы'} to={'/age2'} />
-        <TabBarLinkComponent text={'Test'} to={'/test'} />
       </StyledNav>
       <CartComponent />
     </StyledBar>
