@@ -66,7 +66,7 @@ export const ProductCardComponent = ({
 }: ProductCardComponentProps) => {
   return (
     <StyledProductCard key={id} onClick={onClick}>
-      <StyledPicture src={picture} />
+      <StyledPicture src={picture} alt={title} />
       <StyledInfo>
         <StyledInfoHeader>
           <StyledTitle>{title}</StyledTitle>
