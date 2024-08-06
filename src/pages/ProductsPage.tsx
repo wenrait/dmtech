@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useGetProductsQuery } from '../../redux/services/api/productsApi.ts';
+import { useGetProductsQuery } from '../redux/services/api/productsApi.ts';
 import { ProductCardComponent } from '../components/Widgets/ProductCardComponent.tsx';
 import { PaginationComponent } from '../components/PaginationComponent.tsx';
 import { useSelector } from 'react-redux';
-import { RootState, useAppDispatch } from '../../redux/store.ts';
-import { setLimit, setPage } from '../../redux/slices/paginationSlice.ts';
+import { RootState, useAppDispatch } from '../redux/store.ts';
+import { setLimit, setPage } from '../redux/slices/paginationSlice.ts';
 
 const StyledProductsPage = styled.div`
   display: flex;

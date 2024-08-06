@@ -1,15 +1,15 @@
-import { useGetProductQuery } from '../../redux/services/api/productsApi.ts';
+import { useGetProductQuery } from '../redux/services/api/productsApi.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LinkButtonComponent } from '../components/Buttons/LinkButtonComponent.tsx';
 import { useSelector } from 'react-redux';
-import { RootState, useAppDispatch } from '../../redux/store.ts';
+import { RootState, useAppDispatch } from '../redux/store.ts';
 import styled, { css } from 'styled-components';
 import { RatingComponent } from '../components/RatingComponent.tsx';
 import { ButtonComponent } from '../components/Buttons/ButtonComponent.tsx';
 import Undo from '../assets/icons/Undo.svg';
 import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
-import { addNewProduct } from '../../redux/slices/cartSlice.ts';
+import { addNewProduct } from '../redux/slices/cartSlice.ts';
 import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
 import { IOrderInfo, IProduct } from '../types.ts';
 

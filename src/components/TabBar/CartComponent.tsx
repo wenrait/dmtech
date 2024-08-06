@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { colors } from '../../styles/colors.ts';
 import { TrashIconComponent } from '../Icons/TrashIconComponent.tsx';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store.ts';
+import { RootState } from '../../redux/store.ts';
 
 const StyledContainer = styled.div`
   display: flex;

@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { productsApi } from './services/api/productsApi';
+import { Action, configureStore, ThunkDispatch } from '@reduxjs/toolkit';
+import { productsApi } from './services/api/productsApi.ts';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { paginationSlice } from './slices/paginationSlice.ts';
 import { useDispatch } from 'react-redux';
@@ -14,10 +14,12 @@ export const store = configureStore({
     cartReducer: cartSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(productsApi.middleware),
+    getDefaultMiddleware()
+      .concat(productsApi.middleware)
+      .concat(cartApi.middleware),
 });
 
-setupListeners(store.dispatch);
+setupListeners(store.dispatch as ThunkDispatch<unknown, unknown, Action>);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
