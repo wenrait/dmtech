@@ -2,12 +2,12 @@ import styled from 'styled-components';
 import { CounterButtonComponent } from './CounterButtonComponent.tsx';
 import { MinusIconComponent } from '../Icons/MinusIconComponent.tsx';
 import { PlusIconComponent } from '../Icons/PlusIconComponent.tsx';
-import { RootState, useAppDispatch } from '../../../redux/store.ts';
+import { RootState, useAppDispatch } from '../../redux/store.ts';
 import {
   decreaseQuantity,
   increaseQuantity,
   setQuantity,
-} from '../../../redux/slices/cartSlice.ts';
+} from '../../redux/slices/cartSlice.ts';
 import { colors } from '../../styles/colors.ts';
 import { useSelector } from 'react-redux';
 import { ChangeEvent, useRef } from 'react';

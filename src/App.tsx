@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { BarComponent } from './components/TabBar/BarComponent.tsx';
 import { ProductsPage } from './pages/ProductsPage.tsx';
 import { ProductPage } from './pages/ProductPage.tsx';
+import { useGetCartQuery } from './redux/services/api/cartApi.ts';
 
 const AppWrapper = styled.div`
   display: flex;
@@ -11,6 +12,16 @@ const AppWrapper = styled.div`
 `;
 
 export const App = () => {
+  const { data, isLoading, error } = useGetCartQuery();
+
+  if (data) {
+    console.log(data);
+  }
+
+  if (error) {
+    console.log(error)
+  }
+
   return (
     <AppWrapper>
       <header>
