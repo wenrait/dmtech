@@ -56,6 +56,9 @@ export const cartSlice = createSlice({
         currentOrder.quantity = Math.floor(10000 / currentOrder.product.price);
       }
     },
+    clearCart: (state) => {
+      state.cart = [];
+    },
   },
 });
 
@@ -64,4 +67,5 @@ export const {
   increaseQuantity,
   decreaseQuantity,
   setQuantity,
+  clearCart
 } = cartSlice.actions;

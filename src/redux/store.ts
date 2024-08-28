@@ -1,6 +1,6 @@
-import { Action, configureStore, ThunkDispatch } from '@reduxjs/toolkit';
+import { Action, configureStore, ThunkDispatch } from '@reduxjs/toolkit/react';
 import { productsApi } from './services/api/productsApi.ts';
-import { setupListeners } from '@reduxjs/toolkit/query';
+import { setupListeners } from '@reduxjs/toolkit/query/react';
 import { paginationSlice } from './slices/paginationSlice.ts';
 import { useDispatch } from 'react-redux';
 import { cartSlice } from './slices/cartSlice.ts';

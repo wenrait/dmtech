@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 import { colors } from '../../styles/colors.ts';
-import { TrashIconComponent } from '../Icons/TrashIconComponent.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store.ts';
+import { useGetCartQuery } from '../../redux/services/api/cartApi.ts';
+import { CartIconComponent } from '../Icons/CartIconComponent.tsx';
+import { useEffect, useState } from 'react';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -45,13 +47,26 @@ export interface TabBarLinkProps {
 }
 
 export const CartComponent = () => {
-  const cart = useSelector((state: RootState) => state.cartReducer.cart);
+  const { data: cartFromApi, error, isLoading, refetch } = useGetCartQuery();
+  const cartLocal = useSelector((state: RootState) => state.cartReducer.cart);
+
+  const [cartLength, setCartLength] = useState(0);
+
+  if (cartFromApi) {
+    console.log(cartFromApi);
+  }
+
+  useEffect(() => {
+    console.log('refetching');
+    refetch();
+  }, [cartLocal]);
 
   return (
     <StyledContainer>
-      <TrashIconComponent />
+      <CartIconComponent />
       <StyledText>
-        Корзина ({cart.reduce((acc, order) => acc + order.quantity, 0)})
+        Корзина ({cartFromApi ? cartFromApi.length : 0})
+        {/*Корзина ({cart.reduce((acc, order) => acc + order.quantity, 0)})*/}
       </StyledText>
     </StyledContainer>
   );

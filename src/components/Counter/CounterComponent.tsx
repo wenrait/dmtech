@@ -4,6 +4,7 @@ import { MinusIconComponent } from '../Icons/MinusIconComponent.tsx';
 import { PlusIconComponent } from '../Icons/PlusIconComponent.tsx';
 import { RootState, useAppDispatch } from '../../redux/store.ts';
 import {
+  addNewProduct,
   decreaseQuantity,
   increaseQuantity,
   setQuantity,
@@ -11,6 +12,12 @@ import {
 import { colors } from '../../styles/colors.ts';
 import { useSelector } from 'react-redux';
 import { ChangeEvent, useRef } from 'react';
+import {
+  useGetCartQuery,
+  useUpdateCartMutation,
+} from '../../redux/services/api/cartApi.ts';
+import { useGetProductQuery } from '../../redux/services/api/productsApi.ts';
+import { IOrderInfo } from '../../types.ts';
 
 const StyledCounterWrapper = styled.div`
   display: flex;
@@ -73,24 +80,110 @@ export interface CounterComponentProps {
 export const CounterComponent = ({ id }: CounterComponentProps) => {
   const dispatch = useAppDispatch();
 
-  const order = useSelector((state: RootState) =>
-    state.cartReducer.cart.find((order) => order.product.id === id),
-  );
+  // const order = useSelector((state: RootState) =>
+  //   state.cartReducer.cart.find((order) => order.product.id === id),
+  // );
+
+  const {
+    data: product,
+    isLoading: productIsLoading,
+    error: productError,
+  } = useGetProductQuery({ id });
+
+  const {
+    data: cart,
+    isLoading: cartIsLoading,
+    error: cartError,
+    refetch: cartRefetch,
+  } = useGetCartQuery();
+
+  const order = cart?.find((order) => order.product.id === id);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleDecreaseQuantity = () => {
-    dispatch(decreaseQuantity(id));
+  const [updateCart] = useUpdateCartMutation();
+
+  const handleDecreaseQuantity = async () => {
+    // dispatch(decreaseQuantity(id));
+    console.log('order', order);
+    console.log('Handle decrease quantity');
+    try {
+      const updatedCart = cart.map((item) =>
+        item.product.id === id
+          ? { ...item, quantity: item.quantity - 1 }
+          : item,
+      );
+
+      console.log(updatedCart);
+      // const response = await updateCart({ data: updatedCart });
+      // console.log(response);
+      cartRefetch();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
-  const handleIncreaseQuantity = () => {
-    dispatch(increaseQuantity(id));
+  const handleIncreaseQuantity = async () => {
+    try {
+      if (order) {
+        console.log('counter order', order);
+        console.log('quantity order', order.quantity);
+        const updatedQuantity = order.quantity + 1;
+        console.log('updatedQuantity', updatedQuantity);
+        const response = await updateCart({
+          data: [{ id, quantity: updatedQuantity }],
+        });
+      } else {
+        console.error('Product not found in cart');
+      }
+    } catch (e) {
+      console.error('Failed to update cart:', e);
+    }
   };
+
+  // const handleIncreaseQuantity = async () => {
+  //   // dispatch(increaseQuantity(id));
+  //   console.log('Handle increase quantity');
+  //   console.log('old', order);
+  //   const existingCart = cart.map((item) => ({
+  //     id,
+  //     quantity: item.quantity,
+  //   }));
+  //   try {
+  //     const updatedCart = cart.map((item) =>
+  //       item.product.id === id
+  //         ? { ...item, quantity: item.quantity + 1 }
+  //         : item,
+  //     );
+  //
+  //     console.log('updated', updatedCart);
+  //
+  //     const response = await updateCart({ data: updatedCart });
+  //     console.log('new', response);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.target.select();
     if (Number(e.target.value) >= 0) {
-      dispatch(setQuantity({ id, quantity: Number(e.target.value) }));
+      // dispatch(setQuantity({ id, quantity: Number(e.target.value) }));
+      console.log('Handle input change');
+      try {
+        const updatedCart = cart.map((item) =>
+          item.product.id === id
+            ? { ...item, quantity: Number(e.target.value) }
+            : item,
+        );
+
+        console.log(updatedCart);
+
+        // const response = await updateCart({ data: updatedCart });
+        // console.log(response);
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
@@ -109,7 +202,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
       />
       <StyledCounterInput
         type={'number'}
-        value={order.quantity}
+        value={order?.quantity}
         onChange={handleInputChange}
         onFocus={handleFocus}
         ref={inputRef}
@@ -119,8 +212,8 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
         $function={'increase'}
         onClick={handleIncreaseQuantity}
         disabled={
-          order.quantity > 9 ||
-          (order.quantity + 1) * order.product.price > 10000
+          order?.quantity > 9 ||
+          (order?.quantity + 1) * order?.product.price > 10000
         }
       />
     </StyledCounterWrapper>

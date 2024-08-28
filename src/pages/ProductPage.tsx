@@ -9,9 +9,15 @@ import { ButtonComponent } from '../components/Buttons/ButtonComponent.tsx';
 import Undo from '../assets/icons/Undo.svg';
 import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
-import { addNewProduct } from '../redux/slices/cartSlice.ts';
+import { addNewProduct, clearCart } from '../redux/slices/cartSlice.ts';
 import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
 import { IOrderInfo, IProduct } from '../types.ts';
+import {
+  useGetCartQuery,
+  useSubmitCartMutation,
+  useUpdateCartMutation,
+} from '../redux/services/api/cartApi.ts';
+import { useEffect, useState } from 'react';
 
 const StyledProductPage = styled.div`
   display: flex;
@@ -148,59 +154,151 @@ export const ProductPage = () => {
     (state: RootState) => state.paginationReducer,
   );
 
-  const order = useSelector((state: RootState) =>
-    state.cartReducer.cart.find((order) => order.product.id === id),
-  );
+  // const [quantity, setQuantity] = useState(0);
+  // let quantity = 0;
 
-  const { data, isLoading, error } = useGetProductQuery({ id });
+  const [quantity, setQuantity] = useState(1);
+  const cartLocal = useSelector((state: RootState) => state.cartReducer.cart);
+
+  // const order = useSelector((state: RootState) =>
+  //   state.cartReducer.cart.find((order) => order.product.id === id),
+  // );
+
+  const {
+    data: product,
+    isLoading: productIsLoading,
+    error: productError,
+  } = useGetProductQuery({ id });
+
+  const {
+    data: cart,
+    isLoading: cartIsLoading,
+    error: cartError,
+    refetch: refetchCart,
+  } = useGetCartQuery();
+
+  const [updateCart] = useUpdateCartMutation();
+  const [submitCart] = useSubmitCartMutation();
+
+  if (cart) {
+    console.log(cart);
+  }
+
+  // const isProductInCart = cart?.find((order) => order.product.id === id);
+
+  const [isProductInCart, setIsProductInCart] = useState(false);
+
+  useEffect(() => {
+    const order = Boolean(cart?.find((order) => order.product.id === id));
+    setIsProductInCart(order);
+  }, [cart]);
+
+  useEffect(() => {
+    console.log('localCart', cartLocal);
+  }, [cartLocal]);
 
   const handleGoBack = () => {
     navigate(`/products?limit=${limit}&page=${page}`);
   };
 
-  const handleAddToCart = (data: IProduct) => {
-    const payload: IOrderInfo = {
-      product: data,
-      quantity: 1,
-      creditedAt: Date.now().toString(),
-    };
-    dispatch(addNewProduct(payload));
+  const handleAddToCart = async () => {
+    try {
+      setIsProductInCart(true);
+      console.log('cart', cart);
+      const existingCart = cart.map((item) => ({
+        id,
+        quantity,
+      }));
+      console.log('existingCart', existingCart);
+      const newItem = {
+        id,
+        quantity: 1,
+      };
+      console.log('newItem', newItem);
+      const newCart = [...existingCart, newItem];
+      console.log('newCart', newCart);
+      const response = await updateCart({ data: newCart });
+      const payload: IOrderInfo = {
+        product,
+        quantity: 1,
+        creditedAt: Date.now().toString(),
+      };
+      dispatch(addNewProduct(payload));
+      // const newCart = cart?.data.push({ id, quantity: 1 });
+      // const response = await updateCart(newCart);
+      // const response = await updateCart({
+      //   data: [
+      //     {
+      //       id,
+      //       quantity: 1,
+      //     },
+      //   ],
+      // });
+      console.log(response);
+      console.log(refetchCart);
+    } catch (e) {
+      console.log(e);
+    }
   };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await submitCart(cart);
+      dispatch(clearCart());
+      console.log(cartLocal);
+      console.log(response);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  // const handleAddToCart = (product: IProduct) => {
+  //   const payload: IOrderInfo = {
+  //     product,
+  //     quantity: 1,
+  //     creditedAt: Date.now().toString(),
+  //   };
+  //   dispatch(addNewProduct(payload));
+  // };
 
   return (
     <StyledProductPage>
       <StyledLinkButtonWrapper>
         <LinkButtonComponent variant={'brand'} onClick={handleGoBack} />
       </StyledLinkButtonWrapper>
-      {isLoading && (
+      {productIsLoading && (
         <StyledInfoCard>
           <StyledTitle>Загрузка...</StyledTitle>
         </StyledInfoCard>
       )}
-      {data && (
+      {product && (
         <StyledCardsContainer>
           <StyledInfoCard>
-            <StyledPicture src={data.picture} alt={data.title} />
+            <StyledPicture src={product.picture} alt={product.title} />
             <StyledInfo>
               <StyledInfoBlock>
-                <StyledTitle>{data.title}</StyledTitle>
+                <StyledTitle>{product.title}</StyledTitle>
                 <StyledComponentWrapper>
-                  <RatingComponent rating={data.rating} />
+                  <RatingComponent rating={product.rating} />
                 </StyledComponentWrapper>
               </StyledInfoBlock>
               <StyledInfoBlock>
-                <StyledPrice>{data.price} ₽</StyledPrice>
-                {!order ? (
+                <StyledPrice>{product.price} ₽</StyledPrice>
+                {!isProductInCart ? (
                   <StyledComponentWrapper>
                     <ButtonComponent
                       text={'Добавить в корзину'}
-                      onClick={() => handleAddToCart(data)}
+                      onClick={() => handleAddToCart()}
+                      // onClick={() => handleAddToCart(data)}
                     />
                   </StyledComponentWrapper>
                 ) : (
                   <StyledCounterWrapper>
                     <CounterComponent id={id} />
-                    <ButtonComponent text={'Оформить заказ'} />
+                    <ButtonComponent
+                      text={'Оформить заказ'}
+                      onClick={() => handleSubmit()}
+                    />
                   </StyledCounterWrapper>
                 )}
               </StyledInfoBlock>
@@ -224,13 +322,13 @@ export const ProductPage = () => {
             <StyledDescriptionTitle>Описание</StyledDescriptionTitle>
             <StyledDescription
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(data.description),
+                __html: DOMPurify.sanitize(product.description),
               }}
             />
           </StyledDescriptionCard>
         </StyledCardsContainer>
       )}
-      {error && (
+      {productError && (
         <StyledInfoCard>
           <StyledTitle>404: Товар не найден</StyledTitle>
         </StyledInfoCard>
