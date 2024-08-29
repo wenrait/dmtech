@@ -1,12 +1,9 @@
 import styled from 'styled-components';
-import {
-  useGetCartQuery,
-  useSubmitCartMutation,
-} from '../../redux/services/api/cartApi.ts';
+import { useGetCartQuery, useSubmitCartMutation } from '@api/cartApi.ts';
 import { CartItemComponent } from './CartItemComponent.tsx';
 import { ButtonComponent } from '../Buttons/ButtonComponent.tsx';
-import { clearCart } from '../../redux/slices/cartSlice.ts';
-import { useAppDispatch } from '../../redux/store.ts';
+import { clearCart } from '@slices/cartSlice.ts';
+import { useAppDispatch } from '@redux/store.ts';
 
 const StyledCartWidget = styled.div`
   position: absolute;
@@ -57,12 +54,6 @@ export const CartWidget = () => {
   } = useGetCartQuery();
 
   const [submitCart] = useSubmitCartMutation();
-
-  if (cart) {
-    console.log('cart from widget', cart);
-    const ids = cart.map((item) => item.product.id);
-    console.log(ids);
-  }
 
   const handleSubmit = async () => {
     try {
