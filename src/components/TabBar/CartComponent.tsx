@@ -67,13 +67,13 @@ export interface TabBarLinkProps {
 }
 
 export const CartComponent = () => {
-  const { data: cartAPI, error, isLoading, refetch } = useGetCartQuery();
+  const { data: cartAPI, isLoading, refetch } = useGetCartQuery();
   const cartLocal = useSelector((state: RootState) => state.cartReducer.cart);
 
   const [widgetVisible, setWidgetVisible] = useState(false);
 
   const handleClick = () => {
-    if (cartAPI.length > 0) {
+    if (cartAPI && cartAPI.length > 0) {
       setWidgetVisible((prevState) => !prevState);
     }
   };
@@ -91,15 +91,7 @@ export const CartComponent = () => {
         <CartIconComponent />
         <StyledText>Корзина</StyledText>
         <StyledTextCounter>
-          (
-          {cartAPI ? (
-            cartAPI.length
-          ) : isLoading ? (
-            <div>..</div>
-          ) : (
-            <div>Ошибка: {error}</div>
-          )}
-          )
+          {cartAPI ? cartAPI.length : isLoading}
         </StyledTextCounter>
       </StyledContainer>
       {widgetVisible && <CartWidget />}

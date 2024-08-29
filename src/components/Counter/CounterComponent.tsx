@@ -5,6 +5,7 @@ import { PlusIconComponent } from '../Icons/PlusIconComponent.tsx';
 import { colors } from '@styles/colors.ts';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useGetCartQuery, useUpdateCartMutation } from '@api//cartApi.ts';
+import { IGetCart } from 'types.ts';
 
 const StyledCounterWrapper = styled.div`
   display: flex;
@@ -61,32 +62,35 @@ const StyledCounterInput = styled.input`
 `;
 
 export interface CounterComponentProps {
-  id: number;
+  id: string;
 }
 
 export const CounterComponent = ({ id }: CounterComponentProps) => {
   const { data: cart, refetch } = useGetCartQuery();
   const [updateCart] = useUpdateCartMutation();
 
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState<IGetCart | undefined>(undefined);
   const [isButtonDisabled, setButtonDisabled] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
-  //const [quantity, setQuantity] = useState(0);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleDecreaseQuantity = async () => {
     try {
-      const existingCart = cart.map((item) => ({
-        id: item.product.id,
-        quantity: item.quantity,
-      }));
-      const newCart = existingCart.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
-      );
-      const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
-      await updateCart({ data: cartWithoutNulls });
-      refetch();
+      if (cart) {
+        const existingCart = cart.map((item) => ({
+          id: item.product.id,
+          quantity: item.quantity,
+        }));
+        const newCart = existingCart.map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+        );
+        const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
+        await updateCart({ data: cartWithoutNulls });
+        refetch();
+      } else {
+        console.error('Корзина недоступна');
+      }
     } catch (e) {
       console.log(e);
     }
@@ -94,15 +98,19 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
 
   const handleIncreaseQuantity = async () => {
     try {
-      const existingCart = cart.map((item) => ({
-        id: item.product.id,
-        quantity: item.quantity,
-      }));
-      const newCart = existingCart.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
-      );
-      await updateCart({ data: newCart });
-      refetch();
+      if (cart) {
+        const existingCart = cart.map((item) => ({
+          id: item.product.id,
+          quantity: item.quantity,
+        }));
+        const newCart = existingCart.map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+        );
+        await updateCart({ data: newCart });
+        refetch();
+      } else {
+        console.error('Козина недоступна');
+      }
     } catch (e) {
       console.log(e);
     }
@@ -112,22 +120,24 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
     e.target.select();
     if (Number(e.target.value) >= 0) {
       try {
-        let newQuantity = Number(e.target.value);
+        if (cart) {
+          let newQuantity = Number(e.target.value);
 
-        if (newQuantity > 10) {
-          newQuantity = 10;
+          if (newQuantity > 10) {
+            newQuantity = 10;
+          }
+
+          const existingCart = cart.map((item) => ({
+            id: item.product.id,
+            quantity: item.quantity,
+          }));
+          const newCart = existingCart.map((item) =>
+            item.id === id ? { ...item, quantity: newQuantity } : item,
+          );
+          const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
+          await updateCart({ data: cartWithoutNulls });
+          refetch();
         }
-
-        const existingCart = cart.map((item) => ({
-          id: item.product.id,
-          quantity: item.quantity,
-        }));
-        const newCart = existingCart.map((item) =>
-          item.id === id ? { ...item, quantity: newQuantity } : item,
-        );
-        const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
-        await updateCart({ data: cartWithoutNulls });
-        refetch();
       } catch (e) {
         console.log(e);
       }
@@ -135,13 +145,15 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
   };
 
   const handleFocus = () => {
-    if ('select' in inputRef.current) {
-      inputRef.current.select();
+    if (inputRef && inputRef.current) {
+      if ('select' in inputRef.current) {
+        inputRef.current.select();
+      }
     }
   };
 
   useEffect(() => {
-    if (cart) {
+    if (cart && cart.length > 0) {
       setOrder(cart.find((item) => item.product.id === id));
       setTotalCost(
         cart.reduce((acc, item) => acc + item.quantity * item.product.price, 0),

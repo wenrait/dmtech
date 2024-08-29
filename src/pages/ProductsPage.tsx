@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useGetProductsQuery } from '@api/productsApi.ts';
 import { ProductCardComponent } from '../components/Widgets/ProductCardComponent.tsx';
@@ -78,27 +78,24 @@ export const ProductsPage = () => {
     navigate(`/products?${params.toString()}`, { replace: true });
   }, [limitUrl, pageUrl, totalPages, dispatch]);
 
-  const {
-    data: products,
-    isLoading,
-    error,
-  } = useGetProductsQuery({
+  const { data: products, isLoading } = useGetProductsQuery({
     limit,
     page,
   });
 
   useEffect(() => {
-    setTotalPages(Math.ceil(products?.meta.total / limit));
+    if (products) {
+      setTotalPages(Math.ceil(products?.meta.total / limit));
+    }
   }, [products, limit]);
 
-  const handleClick = (id) => {
+  const handleClick = (id: string) => {
     navigate(`/products/${id}`, { replace: true });
   };
 
   return (
     <StyledProductsPage>
       <StyledProductsWrapper>
-        {error && <div>{error}</div>}
         {isLoading && <div>Loading...</div>}
         {products?.data &&
           products?.data?.map((product) => (
@@ -106,8 +103,6 @@ export const ProductsPage = () => {
               key={product.id}
               id={product.id}
               title={product.title}
-              description={product.description}
-              category={product.category}
               price={product.price}
               picture={product.picture}
               rating={product.rating}

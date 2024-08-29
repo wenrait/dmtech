@@ -1,8 +1,8 @@
 import styled, { css } from 'styled-components';
-import { useEffect } from 'react';
-import { colors } from '../../styles/colors.ts';
+import { colors } from "@styles/colors.ts";
 import { format } from 'date-fns';
-import { ru } from "date-fns/locale";
+import { ru } from 'date-fns/locale';
+import { IOrderInfo } from 'types.ts';
 
 const StyledOrderCard = styled.div`
   display: flex;
@@ -93,7 +93,7 @@ const StyledOrderAndPrice = styled.div`
 `;
 
 export interface OrderCardComponentProps {
-  orderItem: unknown;
+  orderItem: IOrderInfo[];
   onClick: () => void;
 }
 
@@ -142,24 +142,5 @@ export const OrderCardComponent = ({ orderItem }: OrderCardComponentProps) => {
         </StyledOrderAndPrice>
       </StyledOrderDateAndPriceWrapper>
     </StyledOrderCard>
-    // <StyledOrderCard onClick={onClick}>
-    //   <StyledPicturesContainer>
-    //     {orderItem.map((item) =>
-    //       item.map((product) => (
-    //         <StyledPicture
-    //           key={product.id}
-    //           src={product.picture}
-    //           alt={product.title}
-    //         />
-    //       )),
-    //     )}
-    //   </StyledPicturesContainer>
-    //   <div>{orderItem.createdAt}</div>
-    //   <div>
-    //     {orderItem.reduce(
-    //       (acc, item) => acc + item.quantity * item.product.price,
-    //     )}
-    //   </div>
-    // </StyledOrderCard>
   );
 };

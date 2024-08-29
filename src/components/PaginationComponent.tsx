@@ -25,15 +25,15 @@ export const PaginationComponent = ({
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
-  const [buttons, setButtons] = useState([]);
+  const [buttons, setButtons] = useState<JSX.Element[]>([]);
 
-  const handlePageChange = (newPage) => {
-    params.set('page', newPage);
+  const handlePageChange = (newPage: number) => {
+    params.set('page', newPage.toString());
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
   useEffect(() => {
-    const newButtons = [];
+    const newButtons: JSX.Element[] = [];
 
     const startPage = Math.max(1, page - 1);
     const endPage = Math.min(pages, page + 1);

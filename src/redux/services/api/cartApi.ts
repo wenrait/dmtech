@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { IGetCart, IUpdateCart } from '../../../types.ts';
 
 export const cartApi = createApi({
   reducerPath: 'cartApi',
@@ -7,24 +8,23 @@ export const cartApi = createApi({
     credentials: 'include',
   }),
   endpoints: ({ query, mutation }) => ({
-    getCart: query<unknown, unknown>({
+    getCart: query<IGetCart[], void>({
       query: () => ({
         url: `/cart`,
         method: 'GET',
       }),
     }),
-    updateCart: mutation<void, { data: { id: string; quantity: number }[] }>({
-      query: (cartData) => ({
+    updateCart: mutation<IGetCart, IUpdateCart>({
+      query: (cartData: IUpdateCart) => ({
         url: `/cart/update`,
         method: 'POST',
         body: cartData,
       }),
     }),
-    submitCart: mutation<void, unknown>({
-      query: (cartData) => ({
+    submitCart: mutation<IGetCart, void>({
+      query: () => ({
         url: `/cart/submit`,
         method: 'POST',
-        body: cartData,
       }),
     }),
   }),

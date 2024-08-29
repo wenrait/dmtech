@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { IGetOrders, IGetOrdersParams } from '../../../types.ts';
 
 export const ordersApi = createApi({
   reducerPath: 'ordersApi',
@@ -7,8 +8,8 @@ export const ordersApi = createApi({
     credentials: 'include',
   }),
   endpoints: ({ query }) => ({
-    getOrders: query<unknown, unknown>({
-      query: (params) => ({
+    getOrders: query<IGetOrders, IGetOrdersParams>({
+      query: (params: IGetOrdersParams) => ({
         url: `/orders?limit=${params.limit}&page=${params.page}`,
         method: 'GET',
       }),

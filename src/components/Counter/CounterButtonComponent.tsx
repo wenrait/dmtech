@@ -6,7 +6,7 @@ interface StyledCounterButtonProps {
   $function: 'decrease' | 'increase';
 }
 
-const StyledCounterButton = styled.button`
+const StyledCounterButton = styled.button<StyledCounterButtonProps>`
   border: 0;
   border-radius: ${(props: StyledCounterButtonProps) =>
     props.$function === 'decrease' ? '12px 0 0 12px' : '0 12px 12px 0'};

@@ -154,7 +154,7 @@ export const ProductPage = () => {
     data: product,
     isLoading: productIsLoading,
     error: productError,
-  } = useGetProductQuery({ id });
+  } = useGetProductQuery({ id: id as string });
   const { data: cart } = useGetCartQuery();
   const [updateCart] = useUpdateCartMutation();
 
@@ -168,24 +168,28 @@ export const ProductPage = () => {
 
   const handleAddToCart = async () => {
     try {
-      const existingCart = cart.map((item) => ({
-        id: item.product.id,
-        quantity: item.quantity,
-      }));
-      const newItem = {
-        id,
-        quantity: 1,
-      };
-      const newCart = [...existingCart, newItem];
-      await updateCart({ data: newCart });
-      const payload: IOrderInfo = {
-        product,
-        quantity: 1,
-        creditedAt: Date.now().toString(),
-      };
-      dispatch(addNewProduct(payload));
+      if (cart && product) {
+        const existingCart = cart.map((item) => ({
+          id: item.product.id,
+          quantity: item.quantity,
+        }));
+        const newItem = {
+          id: id as string,
+          quantity: 1,
+        };
+        const newCart = [...existingCart, newItem];
+        await updateCart({ data: newCart });
+        const payload: IOrderInfo = {
+          product,
+          quantity: 1,
+          createdAt: Date.now().toString(),
+        };
+        dispatch(addNewProduct(payload));
+      } else {
+        console.error('Корзина недоступна');
+      }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -244,7 +248,7 @@ export const ProductPage = () => {
                   </StyledComponentWrapper>
                 ) : (
                   <StyledCounterWrapper>
-                    <CounterComponent id={id} />
+                    <CounterComponent id={id as string} />
                     <ButtonComponent
                       text={'Оформить заказ'}
                       onClick={() => handleGoBack()}

@@ -1,11 +1,11 @@
 import { Action, configureStore, ThunkDispatch } from '@reduxjs/toolkit/react';
-import { productsApi } from './services/api/productsApi.ts';
+import { productsApi } from '@api/productsApi.ts';
 import { setupListeners } from '@reduxjs/toolkit/query/react';
 import { paginationSlice } from './slices/paginationSlice.ts';
 import { useDispatch } from 'react-redux';
 import { cartSlice } from './slices/cartSlice.ts';
-import { cartApi } from './services/api/cartApi.ts';
-import { ordersApi } from "./services/api/ordersApi.ts";
+import { cartApi } from '@api/cartApi.ts';
+import { ordersApi } from '@api/ordersApi.ts';
 
 export const store = configureStore({
   reducer: {

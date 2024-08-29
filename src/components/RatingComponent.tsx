@@ -13,8 +13,8 @@ export const RatingComponent = ({ rating }: RatingComponentProps) => {
   const int = Math.floor(rating);
   const fract = Math.floor((rating - Math.floor(rating)) * 100);
 
-  let uniqueId;
-  const getStar = (fill) => {
+  let uniqueId: number;
+  const getStar = (fill: string) => {
     uniqueId = Math.random();
 
     return (

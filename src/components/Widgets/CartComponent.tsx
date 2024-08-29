@@ -57,17 +57,13 @@ export const CartWidget = () => {
 
   const handleSubmit = async () => {
     try {
-      await submitCart(cart);
+      await submitCart();
       dispatch(clearCart());
       cartRefetch();
     } catch (e) {
       console.log(e);
     }
   };
-
-  if (cartError) {
-    return <div>Ошибка: {cartError}</div>;
-  }
 
   return (
     <StyledCartWidget>
@@ -78,7 +74,7 @@ export const CartWidget = () => {
       ) : (
         <div>Корзина пуста</div>
       )}
-      {cart.length > 0 && (
+      {cart && cart.length > 0 && (
         <StyledWrapper>
           <StyledText>Итого</StyledText>
           <StyledPrice>
@@ -90,7 +86,7 @@ export const CartWidget = () => {
           </StyledPrice>
         </StyledWrapper>
       )}
-      {cart.length > 0 && (
+      {cart && cart.length > 0 && (
         <StyledButtonWrapper>
           <ButtonComponent text={'Оформить заказ'} onClick={handleSubmit} />
         </StyledButtonWrapper>

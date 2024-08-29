@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { PaginationComponent } from '@components/PaginationComponent.tsx';
 import { useSelector } from 'react-redux';
@@ -79,11 +79,7 @@ export const OrdersPage = () => {
     navigate(`/orders?${params.toString()}`, { replace: true });
   }, [limitUrl, pageUrl, totalPages, dispatch]);
 
-  const {
-    data: orders,
-    isLoading,
-    error,
-  } = useGetOrdersQuery({
+  const { data: orders, isLoading } = useGetOrdersQuery({
     limit,
     page,
   });
@@ -101,7 +97,6 @@ export const OrdersPage = () => {
   return (
     <StyledOrdersPage>
       <StyledOrdersWrapper>
-        {error && <div>{error}</div>}
         {isLoading && <div>Loading...</div>}
         {orders?.data &&
           orders.data.map((order, index) => (

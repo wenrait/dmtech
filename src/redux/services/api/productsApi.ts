@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import {
+  IGetProductsRes,
   IProduct,
   IProductReq,
   IProductsReq,
-  IProductsRes,
 } from '../../../types.ts';
 
 export const productsApi = createApi({
@@ -13,7 +13,7 @@ export const productsApi = createApi({
     credentials: 'include',
   }),
   endpoints: ({ query }) => ({
-    getProducts: query<IProductsRes, IProductsReq>({
+    getProducts: query<IGetProductsRes, IProductsReq>({
       query: (params: IProductsReq) => ({
         url: `/products?limit=${params.limit}&page=${params.page}`,
         method: 'GET',
