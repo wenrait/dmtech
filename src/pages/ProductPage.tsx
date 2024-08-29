@@ -9,7 +9,7 @@ import { ButtonComponent } from '../components/Buttons/ButtonComponent.tsx';
 import Undo from '../assets/icons/Undo.svg';
 import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
-import { addNewProduct } from '@slices/cartSlice.ts';
+import { addNewProduct, deleteProduct } from '@slices/cartSlice.ts';
 import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
 import { IOrderInfo } from '../types/types.ts';
 import { useGetCartQuery, useUpdateCartMutation } from '@api/cartApi.ts';
@@ -160,6 +160,7 @@ export const ProductPage = () => {
   const [updateCart] = useUpdateCartMutation();
 
   const [isProductInCart, setIsProductInCart] = useState(false);
+  const [isQuantityNull, setQuantityNull] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
   const [isButtonDisabled, setButtonDisabled] = useState(false);
 
@@ -194,6 +195,24 @@ export const ProductPage = () => {
     }
   };
 
+  const handleDeleteFromCart = async () => {
+    try {
+      if (cart && id) {
+        const existingCart = cart.map((item) => ({
+          id: item.product.id,
+          quantity: item.quantity,
+        }));
+        const newCart = existingCart.filter((item) => item.id !== id);
+        await updateCart({ data: newCart });
+        dispatch(deleteProduct(id));
+      } else {
+        console.error('Корзина недоступна');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     if (cart) {
       setTotalCost(
@@ -215,6 +234,18 @@ export const ProductPage = () => {
       );
     }
   }, [cart]);
+
+  useEffect(() => {
+    if (cart) {
+      setQuantityNull(
+        Boolean(cart.find((order) => order.product.id === id)?.quantity === 0),
+      );
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    console.log(isQuantityNull);
+  }, [isQuantityNull]);
 
   return (
     <StyledProductPage>
@@ -254,10 +285,17 @@ export const ProductPage = () => {
                 ) : (
                   <StyledCounterWrapper>
                     <CounterComponent id={id as string} />
-                    <ButtonComponent
-                      text={'Оформить заказ'}
-                      onClick={() => handleGoBack()}
-                    />
+                    {isQuantityNull ? (
+                      <ButtonComponent
+                        text={'Удалить'}
+                        onClick={() => handleDeleteFromCart()}
+                      />
+                    ) : (
+                      <ButtonComponent
+                        text={'Оформить заказ'}
+                        onClick={() => handleGoBack()}
+                      />
+                    )}
                   </StyledCounterWrapper>
                 )}
               </StyledInfoBlock>

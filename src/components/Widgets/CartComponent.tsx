@@ -1,5 +1,9 @@
 import styled from 'styled-components';
-import { useGetCartQuery, useSubmitCartMutation } from '@api/cartApi.ts';
+import {
+  useGetCartQuery,
+  useSubmitCartMutation,
+  useUpdateCartMutation,
+} from '@api/cartApi.ts';
 import { CartItemComponent } from './CartItemComponent.tsx';
 import { ButtonComponent } from '../Buttons/ButtonComponent.tsx';
 import { clearCart } from '@slices/cartSlice.ts';
@@ -53,12 +57,28 @@ export const CartWidget = () => {
     refetch: cartRefetch,
   } = useGetCartQuery();
 
+  const [updateCart] = useUpdateCartMutation();
   const [submitCart] = useSubmitCartMutation();
 
   const handleSubmit = async () => {
     try {
-      await submitCart();
-      dispatch(clearCart());
+      if (!cart || cart.length === 0) {
+        console.error('Корзина недоступна или пуста');
+        return;
+      }
+      const existingCart = cart.map((item) => ({
+        id: item.product.id,
+        quantity: item.quantity,
+      }));
+      const cartWithoutNulls = existingCart.filter((item) => item.quantity > 0);
+      await updateCart({ data: cartWithoutNulls });
+      cartRefetch();
+
+      if (cartWithoutNulls.length > 0) {
+        await submitCart();
+        dispatch(clearCart());
+      }
+
       cartRefetch();
     } catch (e) {
       console.log(e);

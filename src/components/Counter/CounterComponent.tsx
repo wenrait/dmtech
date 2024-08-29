@@ -71,7 +71,8 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
 
   const [order, setOrder] = useState<IGetCart | undefined>(undefined);
   const [quantity, setQuantity] = useState(0);
-  const [isButtonDisabled, setButtonDisabled] = useState(false);
+  const [isMinusButtonDisabled, setMinusButtonDisabled] = useState(false);
+  const [isPlusButtonDisabled, setPlusButtonDisabled] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -86,8 +87,8 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
         const newCart = existingCart.map((item) =>
           item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
         );
-        const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
-        await updateCart({ data: cartWithoutNulls });
+        // const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
+        await updateCart({ data: newCart });
         refetch();
       } else {
         console.error('Корзина недоступна');
@@ -121,11 +122,15 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
     e.target.select();
     if (Number(e.target.value) >= 0) {
       try {
-        if (cart) {
+        if (cart && order) {
           let newQuantity = Number(e.target.value);
 
           if (newQuantity > 10) {
             newQuantity = 10;
+          }
+
+          if (totalCost + newQuantity * order.product.price > 10000) {
+            newQuantity = Math.ceil((10000 - totalCost) / order.product.price);
           }
 
           const existingCart = cart.map((item) => ({
@@ -164,10 +169,16 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
 
   useEffect(() => {
     if (order) {
+      setMinusButtonDisabled(order.quantity === 0);
+    }
+  }, [order]);
+
+  useEffect(() => {
+    if (order) {
       const nextTotalCost = totalCost + order.product.price;
       const exceedsLimit = nextTotalCost > 10000;
       const exceedsMaxQuantity = order.quantity + 1 > 10;
-      setButtonDisabled(exceedsLimit || exceedsMaxQuantity);
+      setPlusButtonDisabled(exceedsLimit || exceedsMaxQuantity);
     }
   }, [totalCost, order]);
 
@@ -183,6 +194,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
         icon={<MinusIconComponent />}
         $function={'decrease'}
         onClick={handleDecreaseQuantity}
+        disabled={isMinusButtonDisabled}
       />
       <StyledCounterInput
         type={'number'}
@@ -195,7 +207,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
         icon={<PlusIconComponent />}
         $function={'increase'}
         onClick={handleIncreaseQuantity}
-        disabled={isButtonDisabled}
+        disabled={isPlusButtonDisabled}
       />
     </StyledCounterWrapper>
   );

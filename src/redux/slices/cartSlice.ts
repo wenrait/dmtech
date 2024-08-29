@@ -16,10 +16,15 @@ export const cartSlice = createSlice({
     addNewProduct: (state, action: PayloadAction<IOrderInfo>) => {
       state.cart.push(action.payload);
     },
+    deleteProduct: (state, action: PayloadAction<string>) => {
+      state.cart = state.cart.filter(
+        (item) => item.product.id !== action.payload,
+      );
+    },
     clearCart: (state) => {
       state.cart = [];
     },
   },
 });
 
-export const { addNewProduct, clearCart } = cartSlice.actions;
+export const { addNewProduct, deleteProduct, clearCart } = cartSlice.actions;

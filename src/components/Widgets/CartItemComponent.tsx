@@ -1,7 +1,14 @@
 import styled from 'styled-components';
-import { useGetCartQuery } from '../../redux/services/api/cartApi.ts';
+import {
+  useGetCartQuery,
+  useUpdateCartMutation,
+} from '../../redux/services/api/cartApi.ts';
 import { CounterComponent } from '../Counter/CounterComponent.tsx';
 import { handleProductPictireError } from '../../utils/helpers.ts';
+import { colors } from '@styles/colors.ts';
+import { LinkButtonComponent } from '@components/Buttons/LinkButtonComponent.tsx';
+import { deleteProduct } from '@redux/slices/cartSlice.ts';
+import { useAppDispatch } from '@redux/store.ts';
 
 const StyledCartItem = styled.div`
   display: flex;
@@ -33,12 +40,26 @@ const StyledTitle = styled.h2`
   font-weight: 400;
 `;
 
+const StyledPriceContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: right;
+  width: 112px;
+`;
+
 const StyledPrice = styled.span`
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: ${colors.grey.default};
+`;
+
+const StyledPriceTotal = styled.span`
   font-size: 20px;
   font-weight: 700;
   line-height: 24px;
-  text-align: right;
-  width: 112px;
 `;
 
 export interface CartItemComponent {
@@ -46,11 +67,13 @@ export interface CartItemComponent {
 }
 
 export const CartItemComponent = ({ id }: CartItemComponent) => {
+  const dispatch = useAppDispatch();
   const {
     data: cart,
     isLoading: cartIsLoading,
     error: cartError,
   } = useGetCartQuery();
+  const [updateCart] = useUpdateCartMutation();
 
   const cartItem = cart?.find((item) => item.product.id === id);
 
@@ -61,6 +84,24 @@ export const CartItemComponent = ({ id }: CartItemComponent) => {
   if (cartIsLoading) {
     return <div>Ошибка: {cartError}</div>;
   }
+
+  const handleDeleteFromCart = async () => {
+    try {
+      if (cart && id) {
+        const existingCart = cart.map((item) => ({
+          id: item.product.id,
+          quantity: item.quantity,
+        }));
+        const newCart = existingCart.filter((item) => item.id !== id);
+        await updateCart({ data: newCart });
+        dispatch(deleteProduct(id));
+      } else {
+        console.error('Корзина недоступна');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   if (cartItem) {
     const { product } = cartItem;
@@ -75,7 +116,21 @@ export const CartItemComponent = ({ id }: CartItemComponent) => {
           <StyledTitle>{product.title}</StyledTitle>
         </StyledPictureAndTitle>
         <CounterComponent id={product.id} />
-        <StyledPrice>{product.price * cartItem.quantity} ₽</StyledPrice>
+        {cartItem.quantity < 1 ? (
+          <LinkButtonComponent
+            variant={'focus'}
+            onClick={() => handleDeleteFromCart()}
+          />
+        ) : (
+          <StyledPriceContainer>
+            {cartItem.quantity > 1 && (
+              <StyledPrice>{product.price} ₽ за шт.</StyledPrice>
+            )}
+            <StyledPriceTotal>
+              {product.price * cartItem.quantity} ₽
+            </StyledPriceTotal>
+          </StyledPriceContainer>
+        )}
       </StyledCartItem>
     );
   }

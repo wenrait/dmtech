@@ -19,12 +19,6 @@ const StyledProductCard = styled.div`
   &:hover {
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.15);
   }
-
-  /* @media (max-width: 1199px) {
-    width: 100%;
-    max-width: 300px;
-    flex-wrap: wrap;
-  } */
 `;
 
 const StyledPictureWrapper = styled.div`
