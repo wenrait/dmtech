@@ -72,7 +72,7 @@ export const CartComponent = () => {
 
   const [widgetVisible, setWidgetVisible] = useState(false);
 
-  const handleClick = () => {
+  const handleMouseEnter = () => {
     if (cartAPI && cartAPI.length > 0) {
       setWidgetVisible((prevState) => !prevState);
     }
@@ -87,14 +87,14 @@ export const CartComponent = () => {
 
   return (
     <StyledWrapper>
-      <StyledContainer onClick={() => handleClick()}>
+      <StyledContainer onMouseEnter={() => handleMouseEnter()}>
         <CartIconComponent />
         <StyledText>Корзина</StyledText>
         <StyledTextCounter>
           ({cartAPI ? cartAPI.length : isLoading})
         </StyledTextCounter>
       </StyledContainer>
-      {widgetVisible && <CartWidget />}
+      {widgetVisible && <CartWidget {...{ setWidgetVisible }} />}
     </StyledWrapper>
   );
 };

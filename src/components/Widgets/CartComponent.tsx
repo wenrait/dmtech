@@ -8,6 +8,7 @@ import { CartItemComponent } from './CartItemComponent.tsx';
 import { ButtonComponent } from '../Buttons/ButtonComponent.tsx';
 import { clearCart } from '@slices/cartSlice.ts';
 import { useAppDispatch } from '@redux/store.ts';
+import { Dispatch, SetStateAction } from 'react';
 
 const StyledCartWidget = styled.div`
   position: absolute;
@@ -19,6 +20,8 @@ const StyledCartWidget = styled.div`
   background: white;
   padding: 8px 24px 24px 24px;
   border-radius: 24px;
+
+  transition: 1120ms;
 `;
 
 const StyledWrapper = styled.div`
@@ -48,7 +51,11 @@ const StyledButtonWrapper = styled.div`
   padding-top: 16px;
 `;
 
-export const CartWidget = () => {
+export interface CartWidgetProps {
+  setWidgetVisible: Dispatch<SetStateAction<boolean>>;
+}
+
+export const CartWidget = ({ setWidgetVisible }: CartWidgetProps) => {
   const dispatch = useAppDispatch();
 
   const {
@@ -85,8 +92,12 @@ export const CartWidget = () => {
     }
   };
 
+  const handleMouseLeave = () => {
+    setWidgetVisible((prevState) => !prevState);
+  };
+
   return (
-    <StyledCartWidget>
+    <StyledCartWidget onMouseLeave={() => handleMouseLeave()}>
       {cart && cart.length > 0 ? (
         cart.map((item) => (
           <CartItemComponent key={item.product.id} id={item.product.id} />
