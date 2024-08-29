@@ -1,4 +1,4 @@
-import { useGetProductQuery } from '../redux/services/api/productsApi.ts';
+import { useGetProductQuery } from '@api/productsApi.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LinkButtonComponent } from '../components/Buttons/LinkButtonComponent.tsx';
 import { useSelector } from 'react-redux';
@@ -9,14 +9,14 @@ import { ButtonComponent } from '../components/Buttons/ButtonComponent.tsx';
 import Undo from '../assets/icons/Undo.svg';
 import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
-import { addNewProduct, clearCart } from '../redux/slices/cartSlice.ts';
+import { addNewProduct, clearCart } from '@slices/cartSlice.ts';
 import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
-import { IOrderInfo, IProduct } from '../types.ts';
+import { IOrderInfo } from '../types.ts';
 import {
   useGetCartQuery,
   useSubmitCartMutation,
   useUpdateCartMutation,
-} from '../redux/services/api/cartApi.ts';
+} from '@api/cartApi.ts';
 import { useEffect, useState } from 'react';
 
 const StyledProductPage = styled.div`
@@ -154,16 +154,6 @@ export const ProductPage = () => {
     (state: RootState) => state.paginationReducer,
   );
 
-  // const [quantity, setQuantity] = useState(0);
-  // let quantity = 0;
-
-  const [quantity, setQuantity] = useState(1);
-  const cartLocal = useSelector((state: RootState) => state.cartReducer.cart);
-
-  // const order = useSelector((state: RootState) =>
-  //   state.cartReducer.cart.find((order) => order.product.id === id),
-  // );
-
   const {
     data: product,
     isLoading: productIsLoading,
@@ -172,30 +162,16 @@ export const ProductPage = () => {
 
   const {
     data: cart,
-    isLoading: cartIsLoading,
-    error: cartError,
-    refetch: refetchCart,
   } = useGetCartQuery();
 
   const [updateCart] = useUpdateCartMutation();
   const [submitCart] = useSubmitCartMutation();
 
-  if (cart) {
-    console.log(cart);
-  }
-
-  // const isProductInCart = cart?.find((order) => order.product.id === id);
-
   const [isProductInCart, setIsProductInCart] = useState(false);
 
   useEffect(() => {
-    const order = Boolean(cart?.find((order) => order.product.id === id));
-    setIsProductInCart(order);
+    setIsProductInCart(Boolean(cart?.find((order) => order.product.id === id)));
   }, [cart]);
-
-  useEffect(() => {
-    console.log('localCart', cartLocal);
-  }, [cartLocal]);
 
   const handleGoBack = () => {
     navigate(`/products?limit=${limit}&page=${page}`);
@@ -204,38 +180,22 @@ export const ProductPage = () => {
   const handleAddToCart = async () => {
     try {
       setIsProductInCart(true);
-      console.log('cart', cart);
       const existingCart = cart.map((item) => ({
-        id,
-        quantity,
+        id: item.product.id,
+        quantity: item.quantity,
       }));
-      console.log('existingCart', existingCart);
       const newItem = {
         id,
         quantity: 1,
       };
-      console.log('newItem', newItem);
       const newCart = [...existingCart, newItem];
-      console.log('newCart', newCart);
-      const response = await updateCart({ data: newCart });
+      await updateCart({ data: newCart });
       const payload: IOrderInfo = {
         product,
         quantity: 1,
         creditedAt: Date.now().toString(),
       };
       dispatch(addNewProduct(payload));
-      // const newCart = cart?.data.push({ id, quantity: 1 });
-      // const response = await updateCart(newCart);
-      // const response = await updateCart({
-      //   data: [
-      //     {
-      //       id,
-      //       quantity: 1,
-      //     },
-      //   ],
-      // });
-      console.log(response);
-      console.log(refetchCart);
     } catch (e) {
       console.log(e);
     }
@@ -243,23 +203,12 @@ export const ProductPage = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await submitCart(cart);
+      await submitCart(cart);
       dispatch(clearCart());
-      console.log(cartLocal);
-      console.log(response);
     } catch (e) {
       console.log(e);
     }
   };
-
-  // const handleAddToCart = (product: IProduct) => {
-  //   const payload: IOrderInfo = {
-  //     product,
-  //     quantity: 1,
-  //     creditedAt: Date.now().toString(),
-  //   };
-  //   dispatch(addNewProduct(payload));
-  // };
 
   return (
     <StyledProductPage>
@@ -289,7 +238,6 @@ export const ProductPage = () => {
                     <ButtonComponent
                       text={'Добавить в корзину'}
                       onClick={() => handleAddToCart()}
-                      // onClick={() => handleAddToCart(data)}
                     />
                   </StyledComponentWrapper>
                 ) : (

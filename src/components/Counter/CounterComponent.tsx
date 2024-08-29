@@ -2,22 +2,9 @@ import styled from 'styled-components';
 import { CounterButtonComponent } from './CounterButtonComponent.tsx';
 import { MinusIconComponent } from '../Icons/MinusIconComponent.tsx';
 import { PlusIconComponent } from '../Icons/PlusIconComponent.tsx';
-import { RootState, useAppDispatch } from '../../redux/store.ts';
-import {
-  addNewProduct,
-  decreaseQuantity,
-  increaseQuantity,
-  setQuantity,
-} from '../../redux/slices/cartSlice.ts';
-import { colors } from '../../styles/colors.ts';
-import { useSelector } from 'react-redux';
-import { ChangeEvent, useRef } from 'react';
-import {
-  useGetCartQuery,
-  useUpdateCartMutation,
-} from '../../redux/services/api/cartApi.ts';
-import { useGetProductQuery } from '../../redux/services/api/productsApi.ts';
-import { IOrderInfo } from '../../types.ts';
+import { colors } from '@styles/colors.ts';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useGetCartQuery, useUpdateCartMutation } from '@api//cartApi.ts';
 
 const StyledCounterWrapper = styled.div`
   display: flex;
@@ -78,46 +65,27 @@ export interface CounterComponentProps {
 }
 
 export const CounterComponent = ({ id }: CounterComponentProps) => {
-  const dispatch = useAppDispatch();
+  const { data: cart, refetch } = useGetCartQuery();
+  const [updateCart] = useUpdateCartMutation();
 
-  // const order = useSelector((state: RootState) =>
-  //   state.cartReducer.cart.find((order) => order.product.id === id),
-  // );
+  const order = cart?.find((item) => item.product.id === id);
 
-  const {
-    data: product,
-    isLoading: productIsLoading,
-    error: productError,
-  } = useGetProductQuery({ id });
-
-  const {
-    data: cart,
-    isLoading: cartIsLoading,
-    error: cartError,
-    refetch: cartRefetch,
-  } = useGetCartQuery();
-
-  const order = cart?.find((order) => order.product.id === id);
+  const [quantity, setQuantity] = useState<number>(order?.quantity);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const [updateCart] = useUpdateCartMutation();
-
   const handleDecreaseQuantity = async () => {
-    // dispatch(decreaseQuantity(id));
-    console.log('order', order);
-    console.log('Handle decrease quantity');
     try {
-      const updatedCart = cart.map((item) =>
-        item.product.id === id
-          ? { ...item, quantity: item.quantity - 1 }
-          : item,
+      const existingCart = cart.map((item) => ({
+        id: item.product.id,
+        quantity: item.quantity,
+      }));
+      const newCart = existingCart.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
       );
-
-      console.log(updatedCart);
-      // const response = await updateCart({ data: updatedCart });
-      // console.log(response);
-      cartRefetch();
+      const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
+      await updateCart({ data: cartWithoutNulls });
+      refetch();
     } catch (e) {
       console.log(e);
     }
@@ -125,62 +93,66 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
 
   const handleIncreaseQuantity = async () => {
     try {
-      if (order) {
-        console.log('counter order', order);
-        console.log('quantity order', order.quantity);
-        const updatedQuantity = order.quantity + 1;
-        console.log('updatedQuantity', updatedQuantity);
-        const response = await updateCart({
-          data: [{ id, quantity: updatedQuantity }],
-        });
-      } else {
-        console.error('Product not found in cart');
-      }
+      const existingCart = cart.map((item) => ({
+        id: item.product.id,
+        quantity: item.quantity,
+      }));
+      const newCart = existingCart.map((item) => {
+        if (item.id === id) {
+          const newQuantity = item.quantity + 1;
+          const newTotal = cart.reduce((sum, cartItem) => {
+            return cartItem.id === id
+              ? sum + cartItem.product.price * newQuantity
+              : sum + cartItem.product.price * cartItem.quantity;
+          }, 0);
+
+          if (newTotal <= 10000) {
+            return { ...item, quantity: newQuantity };
+          }
+        }
+        return item;
+      });
+      await updateCart({ data: newCart });
+      refetch();
     } catch (e) {
-      console.error('Failed to update cart:', e);
+      console.log(e);
     }
   };
 
-  // const handleIncreaseQuantity = async () => {
-  //   // dispatch(increaseQuantity(id));
-  //   console.log('Handle increase quantity');
-  //   console.log('old', order);
-  //   const existingCart = cart.map((item) => ({
-  //     id,
-  //     quantity: item.quantity,
-  //   }));
-  //   try {
-  //     const updatedCart = cart.map((item) =>
-  //       item.product.id === id
-  //         ? { ...item, quantity: item.quantity + 1 }
-  //         : item,
-  //     );
-  //
-  //     console.log('updated', updatedCart);
-  //
-  //     const response = await updateCart({ data: updatedCart });
-  //     console.log('new', response);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
     e.target.select();
     if (Number(e.target.value) >= 0) {
-      // dispatch(setQuantity({ id, quantity: Number(e.target.value) }));
-      console.log('Handle input change');
       try {
-        const updatedCart = cart.map((item) =>
-          item.product.id === id
-            ? { ...item, quantity: Number(e.target.value) }
-            : item,
+        let newQuantity = Number(e.target.value);
+
+        if (newQuantity > 10) {
+          newQuantity = 10;
+        }
+        const currentCartValue = cart
+          .filter((item) => item.product.id !== order?.product.id)
+          .reduce(
+            (total, item) => total + item.quantity * item.product.price,
+            0,
+          );
+
+        const maxQuantity = Math.floor(
+          (10000 - currentCartValue) / order.product.price,
         );
 
-        console.log(updatedCart);
+        if (newQuantity > maxQuantity) {
+          newQuantity = maxQuantity;
+        }
 
-        // const response = await updateCart({ data: updatedCart });
-        // console.log(response);
+        const existingCart = cart.map((item) => ({
+          id: item.product.id,
+          quantity: item.quantity,
+        }));
+        const newCart = existingCart.map((item) =>
+          item.id === id ? { ...item, quantity: newQuantity } : item,
+        );
+        const cartWithoutNulls = newCart.filter((item) => item.quantity > 0);
+        await updateCart({ data: cartWithoutNulls });
+        refetch();
       } catch (e) {
         console.log(e);
       }
@@ -193,6 +165,12 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
     }
   };
 
+  useEffect(() => {
+    if (cart) {
+      setQuantity(cart?.find((order) => order.product.id === id)?.quantity);
+    }
+  }, [cart, id]);
+
   return (
     <StyledCounterWrapper>
       <CounterButtonComponent
@@ -202,7 +180,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
       />
       <StyledCounterInput
         type={'number'}
-        value={order?.quantity}
+        value={quantity}
         onChange={handleInputChange}
         onFocus={handleFocus}
         ref={inputRef}
@@ -211,10 +189,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
         icon={<PlusIconComponent />}
         $function={'increase'}
         onClick={handleIncreaseQuantity}
-        disabled={
-          order?.quantity > 9 ||
-          (order?.quantity + 1) * order?.product.price > 10000
-        }
+        disabled={quantity > 9 || (quantity + 1) * order?.product.price > 10000}
       />
     </StyledCounterWrapper>
   );

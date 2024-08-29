@@ -34,10 +34,34 @@ export const PaginationComponent = ({
 
   useEffect(() => {
     const newButtons = [];
-    for (let i = 1; i <= pages; i++) {
+
+    const startPage = Math.max(1, page - 1);
+    const endPage = Math.min(pages, page + 1);
+
+    if (startPage > 1) {
       newButtons.push(
         <PaginationButtonComponent
-          key={`pagination-button-${i}`}
+          key="page-1"
+          number={1}
+          className={1 === page ? 'active' : ''}
+          onClick={() => handlePageChange(1)}
+        />,
+      );
+
+      if (startPage > 2) {
+        newButtons.push(
+          <PaginationButtonComponent
+            key={`${Math.random() * 1000}`}
+            number={'...'}
+          />,
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      newButtons.push(
+        <PaginationButtonComponent
+          key={`page-${i}`}
           number={i}
           className={i === page ? 'active' : ''}
           onClick={() => handlePageChange(i)}
@@ -45,8 +69,27 @@ export const PaginationComponent = ({
       );
     }
 
+    if (endPage < pages) {
+      if (endPage < pages - 1) {
+        newButtons.push(
+          <PaginationButtonComponent
+            key={`${Math.random() * 1000}`}
+            number={'...'}
+          />,
+        );
+      }
+      newButtons.push(
+        <PaginationButtonComponent
+          key={`page-${pages}`}
+          number={pages}
+          className={pages === page ? 'active' : ''}
+          onClick={() => handlePageChange(pages)}
+        />,
+      );
+    }
+
     setButtons(newButtons);
-  }, [page, pages]);
+  }, [page, pages, navigate, location]);
 
   return (
     <PaginationWrapper>

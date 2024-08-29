@@ -5,18 +5,21 @@ import { paginationSlice } from './slices/paginationSlice.ts';
 import { useDispatch } from 'react-redux';
 import { cartSlice } from './slices/cartSlice.ts';
 import { cartApi } from './services/api/cartApi.ts';
+import { ordersApi } from "./services/api/ordersApi.ts";
 
 export const store = configureStore({
   reducer: {
     [productsApi.reducerPath]: productsApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
+    [ordersApi.reducerPath]: ordersApi.reducer,
     paginationReducer: paginationSlice.reducer,
     cartReducer: cartSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(productsApi.middleware)
-      .concat(cartApi.middleware),
+      .concat(cartApi.middleware)
+      .concat(ordersApi.middleware),
 });
 
 setupListeners(store.dispatch as ThunkDispatch<unknown, unknown, Action>);

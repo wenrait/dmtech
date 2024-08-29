@@ -7,6 +7,7 @@ const StyledProductCard = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 
   width: 250px;
   border-radius: 12px;
@@ -16,6 +17,12 @@ const StyledProductCard = styled.div`
   cursor: pointer;
   &:hover {
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 1199px) {
+    width: 100%;
+    max-width: 300px;
+    flex-wrap: wrap;
   }
 `;
 

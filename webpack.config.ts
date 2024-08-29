@@ -11,6 +11,15 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    alias: {
+      '@assets': path.resolve(__dirname, 'src/assets'),
+      '@components': path.resolve(__dirname, 'src/components'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@styles': path.resolve(__dirname, 'src/styles'),
+      '@redux': path.resolve(__dirname, 'src/redux'),
+      '@slices': path.resolve(__dirname, 'src/redux/slices'),
+      '@api': path.resolve(__dirname, 'src/redux/services/api'),
+    },
   },
   module: {
     rules: [
@@ -33,6 +42,9 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
+        generator: {
+          filename: 'assets/[name][ext]',
+        },
       },
     ],
   },

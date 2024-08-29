@@ -24,7 +24,18 @@
     "noFallthroughCasesInSwitch": true,
 
     "esModuleInterop": true,
-    "sourceMap": true
+    "sourceMap": true,
+
+    "baseUrl": "./src",
+    "paths": {
+      "@assets/*": ["assets/*"],
+      "@components/*": ["components/*"],
+      "@pages/*": ["pages/*"],
+      "@styles/*": ["styles/*"],
+      "@redux/*": ["redux/*"],
+      "@slices/*": ["redux/slices/*"],
+      "@api/*": ["redux/services/api/*"]
+    }
   },
   "include": ["src"],
 }

@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { colors } from '../../styles/colors.ts';
+import { colors } from '@styles/colors.ts';
 
 const StyledLink = styled(NavLink)`
   color: ${colors.black};

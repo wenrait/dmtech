@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { colors } from '../../styles/colors.ts';
+import { colors } from '@styles/colors.ts';
 import { ReactNode } from 'react';
 
 const StyledCounterButton = styled.button`

@@ -1,14 +1,14 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useGetProductsQuery } from '@api/productsApi.ts';
-import { ProductCardComponent } from '../components/Widgets/ProductCardComponent.tsx';
-import { PaginationComponent } from '../components/PaginationComponent.tsx';
+import { PaginationComponent } from '@components/PaginationComponent.tsx';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../redux/store.ts';
 import { setLimit, setPage } from '@slices/paginationSlice.ts';
+import { useGetOrdersQuery } from '@api/ordersApi.ts';
+import { OrderCardComponent } from '@components/Widgets/OrderCardComponent.tsx';
 
-const StyledProductsPage = styled.div`
+const StyledOrdersPage = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -16,15 +16,16 @@ const StyledProductsPage = styled.div`
   max-width: 1350px;
 `;
 
-const StyledProductsWrapper = styled.div`
+const StyledOrdersWrapper = styled.div`
   display: flex;
   justify-content: center;
   gap: 24px;
   flex-wrap: wrap;
-  max-width: 1350px;
+  width: 100%;
+  max-width: 1280px;
 `;
 
-export const ProductsPage = () => {
+export const OrdersPage = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export const ProductsPage = () => {
     (state: RootState) => state.paginationReducer,
   );
 
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   const params = new URLSearchParams(location.search);
   const limitUrl = params.get('limit');
@@ -47,14 +48,14 @@ export const ProductsPage = () => {
     if (!params.has('page')) {
       params.set('page', page.toString());
     }
-    navigate(`/products?${params.toString()}`, { replace: true });
+    navigate(`/orders?${params.toString()}`, { replace: true });
   }, [limit, page, navigate]);
 
   useEffect(() => {
     if (limitUrl) {
-      if (Number(limitUrl) < 10) {
-        params.set('limit', '10');
-        dispatch(setLimit(10));
+      if (Number(limitUrl) < 8) {
+        params.set('limit', '8');
+        dispatch(setLimit(8));
       } else if (Number(limitUrl) > 200) {
         params.set('limit', '200');
         dispatch(setLimit(200));
@@ -75,47 +76,43 @@ export const ProductsPage = () => {
       }
     }
 
-    navigate(`/products?${params.toString()}`, { replace: true });
+    navigate(`/orders?${params.toString()}`, { replace: true });
   }, [limitUrl, pageUrl, totalPages, dispatch]);
 
   const {
-    data: products,
+    data: orders,
     isLoading,
     error,
-  } = useGetProductsQuery({
+  } = useGetOrdersQuery({
     limit,
     page,
   });
 
-  useEffect(() => {
-    setTotalPages(Math.ceil(products?.meta.total / limit));
-  }, [products, limit]);
+  if (orders) {
+    console.log(orders);
+  }
 
-  const handleClick = (id) => {
-    navigate(`/products/${id}`, { replace: true });
-  };
+  useEffect(() => {
+    if (orders) {
+      setTotalPages(Math.ceil(orders?.meta.total / limit));
+    }
+  }, [orders, limit]);
 
   return (
-    <StyledProductsPage>
-      <StyledProductsWrapper>
+    <StyledOrdersPage>
+      <StyledOrdersWrapper>
         {error && <div>{error}</div>}
         {isLoading && <div>Loading...</div>}
-        {products?.data &&
-          products?.data?.map((product) => (
-            <ProductCardComponent
-              key={product.id}
-              id={product.id}
-              title={product.title}
-              description={product.description}
-              category={product.category}
-              price={product.price}
-              picture={product.picture}
-              rating={product.rating}
-              onClick={() => handleClick(product.id)}
+        {orders?.data &&
+          orders.data.map((order, index) => (
+            <OrderCardComponent
+              key={`order-${index}`}
+              orderItem={order}
+              onClick={() => console.log(order)}
             />
           ))}
-      </StyledProductsWrapper>
+      </StyledOrdersWrapper>
       <PaginationComponent pages={totalPages} page={page} />
-    </StyledProductsPage>
+    </StyledOrdersPage>
   );
 };

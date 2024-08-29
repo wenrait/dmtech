@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { colors } from '../../styles/colors.ts';
+import { colors } from '@styles/colors.ts';
 import { ReactNode } from 'react';
 
 const StyledPaginationButton = styled.button`
@@ -57,7 +57,7 @@ const StyledPaginationButton = styled.button`
 `;
 
 export interface PaginationButtonProps {
-  number?: number;
+  number?: number | string;
   icon?: ReactNode;
   disabled?: boolean;
   className?: string;

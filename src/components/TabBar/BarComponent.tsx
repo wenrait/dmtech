@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { TabBarLinkComponent } from './TabBarLinkComponent.tsx';
 import { CartComponent } from './CartComponent.tsx';
-import Logo from '../../assets/icons/Logo.svg';
+import Logo from '@assets/icons/Logo.svg';
 
 const StyledBar = styled.div`
   width: 100%;
@@ -31,7 +31,7 @@ export const BarComponent = () => {
       <StyledLogo src={Logo} alt={'Синий куб'} />
       <StyledNav>
         <TabBarLinkComponent text={'Товары'} to={'/products?limit=10&page=1'} />
-        <TabBarLinkComponent text={'Заказы'} to={'/age2'} />
+        <TabBarLinkComponent text={'Заказы'} to={'/orders?limit=8&page=1'} />
       </StyledNav>
       <CartComponent />
     </StyledBar>

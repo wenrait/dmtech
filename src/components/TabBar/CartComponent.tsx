@@ -1,10 +1,15 @@
 import styled from 'styled-components';
-import { colors } from '../../styles/colors.ts';
+import { colors } from '@styles/colors.ts';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store.ts';
-import { useGetCartQuery } from '../../redux/services/api/cartApi.ts';
+import { RootState } from '@redux/store.ts';
+import { useGetCartQuery } from '@api//cartApi.ts';
 import { CartIconComponent } from '../Icons/CartIconComponent.tsx';
 import { useEffect, useState } from 'react';
+import { CartWidget } from '../Widgets/CartComponent.tsx';
+
+const StyledWrapper = styled.div`
+  position: relative;
+`;
 
 const StyledContainer = styled.div`
   display: flex;
@@ -14,6 +19,11 @@ const StyledContainer = styled.div`
   cursor: pointer;
   transition: 120ms;
 
+  color: ${colors.black};
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+
   svg {
     path {
       fill: ${colors.black};
@@ -22,6 +32,9 @@ const StyledContainer = styled.div`
   }
 
   &:hover {
+    span {
+      color: ${colors.brand.default};
+    }
     svg {
       path {
         fill: ${colors.brand.default};
@@ -34,11 +47,18 @@ const StyledText = styled.span`
   color: ${colors.black};
   font-weight: 700;
   font-size: 16px;
-  transition: 120ms;
   text-decoration: none;
 
-  &:hover {
-    color: ${colors.brand.default};
+  @media (max-width: 767px) {
+    display: none;
+  }
+`;
+
+const StyledTextCounter = styled.span`
+  color: ${colors.black};
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
 `;
 
 export interface TabBarLinkProps {
@@ -47,27 +67,42 @@ export interface TabBarLinkProps {
 }
 
 export const CartComponent = () => {
-  const { data: cartFromApi, error, isLoading, refetch } = useGetCartQuery();
+  const { data: cartAPI, error, isLoading, refetch } = useGetCartQuery();
   const cartLocal = useSelector((state: RootState) => state.cartReducer.cart);
 
-  const [cartLength, setCartLength] = useState(0);
+  const [widgetVisible, setWidgetVisible] = useState(false);
 
-  if (cartFromApi) {
-    console.log(cartFromApi);
-  }
+  const handleClick = () => {
+    if (cartAPI.length > 0) {
+      setWidgetVisible((prevState) => !prevState);
+    }
+  };
 
   useEffect(() => {
-    console.log('refetching');
     refetch();
-  }, [cartLocal]);
+    if (cartAPI?.length === 0 && widgetVisible) {
+      setWidgetVisible((prevState) => !prevState);
+    }
+  }, [cartLocal, cartAPI]);
 
   return (
-    <StyledContainer>
-      <CartIconComponent />
-      <StyledText>
-        Корзина ({cartFromApi ? cartFromApi.length : 0})
-        {/*Корзина ({cart.reduce((acc, order) => acc + order.quantity, 0)})*/}
-      </StyledText>
-    </StyledContainer>
+    <StyledWrapper>
+      <StyledContainer onClick={() => handleClick()}>
+        <CartIconComponent />
+        <StyledText>Корзина</StyledText>
+        <StyledTextCounter>
+          (
+          {cartAPI ? (
+            cartAPI.length
+          ) : isLoading ? (
+            <div>..</div>
+          ) : (
+            <div>Ошибка: {error}</div>
+          )}
+          )
+        </StyledTextCounter>
+      </StyledContainer>
+      {widgetVisible && <CartWidget />}
+    </StyledWrapper>
   );
 };
