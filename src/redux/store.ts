@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { cartSlice } from './slices/cartSlice.ts';
 import { cartApi } from '@api/cartApi.ts';
 import { ordersApi } from '@api/ordersApi.ts';
+import { scrollSlice } from './slices/scrollSlice.ts';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     [ordersApi.reducerPath]: ordersApi.reducer,
     paginationReducer: paginationSlice.reducer,
     cartReducer: cartSlice.reducer,
+    scrollReducer: scrollSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
