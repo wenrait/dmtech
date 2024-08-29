@@ -14,7 +14,7 @@ import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
 import { IOrderInfo } from '../types/types.ts';
 import { useGetCartQuery, useUpdateCartMutation } from '@api/cartApi.ts';
 import { useEffect, useState } from 'react';
-import { handleProductPictireError } from '../utils/helpers.ts';
+import { dividePrice, handleProductPictireError } from '../utils/helpers.ts';
 
 const StyledProductPage = styled.div`
   display: flex;
@@ -273,7 +273,7 @@ export const ProductPage = () => {
                 </StyledComponentWrapper>
               </StyledInfoBlock>
               <StyledInfoBlock>
-                <StyledPrice>{product.price} ₽</StyledPrice>
+                <StyledPrice>{dividePrice(product.price)}</StyledPrice>
                 {!isProductInCart ? (
                   <StyledComponentWrapper>
                     <ButtonComponent

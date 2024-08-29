@@ -3,7 +3,7 @@ import { colors } from '@styles/colors.ts';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { IOrderInfo } from 'types/types';
-import { handleProductPictireError } from '../../utils/helpers';
+import { dividePrice, handleProductPictireError } from '../../utils/helpers';
 
 const StyledOrderCard = styled.div`
   display: flex;
@@ -135,11 +135,12 @@ export const OrderCardComponent = ({ orderItem }: OrderCardComponentProps) => {
             {format(date, 'd MMMM yyyy', { locale: ru })}
           </StyledDetailsText>
           <StyledDetailsText>
-            {orderItem.reduce(
-              (acc, item) => acc + item.product.price * item.quantity,
-              0,
-            )}{' '}
-            ₽
+            {dividePrice(
+              orderItem.reduce(
+                (acc, item) => acc + item.product.price * item.quantity,
+                0,
+              ),
+            )}
           </StyledDetailsText>
         </StyledOrderAndPrice>
       </StyledOrderDateAndPriceWrapper>

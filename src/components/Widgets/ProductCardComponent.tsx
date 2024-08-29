@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { IProduct } from '../../types/types.ts';
 import { RatingComponent } from '../RatingComponent.tsx';
-import { handleProductPictireError } from '../../utils/helpers.ts';
+import { dividePrice, handleProductPictireError } from '../../utils/helpers.ts';
 
 const StyledProductCard = styled.div`
   display: flex;
@@ -84,7 +84,7 @@ export const ProductCardComponent = ({
           <StyledTitle>{title}</StyledTitle>
           <RatingComponent rating={Number(rating)} />
         </StyledInfoHeader>
-        <StyledPrice>{price} ₽</StyledPrice>
+        <StyledPrice>{dividePrice(price)}</StyledPrice>
       </StyledInfo>
     </StyledProductCard>
   );

@@ -5,3 +5,13 @@ export const handleProductPictireError = (e: SyntheticEvent) => {
   const image = e.target as HTMLImageElement;
   image.src = Placeholder;
 };
+
+export const dividePrice = (price: number) => {
+  const integer = Math.floor(price / 1000);
+  const decimal = price % 1000;
+  if (integer > 0) {
+    return `${integer} ${decimal} ₽`;
+  } else {
+    return `${price} ₽`;
+  }
+};

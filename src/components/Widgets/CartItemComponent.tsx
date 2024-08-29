@@ -4,7 +4,7 @@ import {
   useUpdateCartMutation,
 } from '../../redux/services/api/cartApi.ts';
 import { CounterComponent } from '../Counter/CounterComponent.tsx';
-import { handleProductPictireError } from '../../utils/helpers.ts';
+import { dividePrice, handleProductPictireError } from '../../utils/helpers.ts';
 import { colors } from '@styles/colors.ts';
 import { LinkButtonComponent } from '@components/Buttons/LinkButtonComponent.tsx';
 import { deleteProduct } from '@redux/slices/cartSlice.ts';
@@ -124,10 +124,12 @@ export const CartItemComponent = ({ id }: CartItemComponent) => {
         ) : (
           <StyledPriceContainer>
             {cartItem.quantity > 1 && (
-              <StyledPrice>{product.price} ₽ за шт.</StyledPrice>
+              <StyledPrice>
+                {dividePrice(cartItem.product.price)} за шт.
+              </StyledPrice>
             )}
             <StyledPriceTotal>
-              {product.price * cartItem.quantity} ₽
+              {dividePrice(product.price * cartItem.quantity)}
             </StyledPriceTotal>
           </StyledPriceContainer>
         )}
