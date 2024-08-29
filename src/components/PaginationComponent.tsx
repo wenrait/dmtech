@@ -33,32 +33,16 @@ export const PaginationComponent = ({
   };
 
   useEffect(() => {
+    console.log(params.get('page'));
+  }, [params]);
+
+  useEffect(() => {
     const newButtons: JSX.Element[] = [];
 
     const startPage = Math.max(1, page - 1);
     const endPage = Math.min(pages, page + 1);
 
-    if (startPage > 1) {
-      newButtons.push(
-        <PaginationButtonComponent
-          key="page-1"
-          number={1}
-          className={1 === page ? 'active' : ''}
-          onClick={() => handlePageChange(1)}
-        />,
-      );
-
-      if (startPage > 2) {
-        newButtons.push(
-          <PaginationButtonComponent
-            key={`${Math.random() * 1000}`}
-            number={'...'}
-          />,
-        );
-      }
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
+    for (let i = 1; i <= Math.min(2, pages); i++) {
       newButtons.push(
         <PaginationButtonComponent
           key={`page-${i}`}
@@ -69,21 +53,38 @@ export const PaginationComponent = ({
       );
     }
 
-    if (endPage < pages) {
-      if (endPage < pages - 1) {
+    if (startPage > 3) {
+      newButtons.push(
+        <PaginationButtonComponent key="left-ellipsis" number="..." />,
+      );
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      if (i > 2 && i < pages - 1) {
         newButtons.push(
           <PaginationButtonComponent
-            key={`${Math.random() * 1000}`}
-            number={'...'}
+            key={`page-${i}`}
+            number={i}
+            className={i === page ? 'active' : ''}
+            onClick={() => handlePageChange(i)}
           />,
         );
       }
+    }
+
+    if (endPage < pages - 2) {
+      newButtons.push(
+        <PaginationButtonComponent key="right-ellipsis" number="..." />,
+      );
+    }
+
+    for (let i = Math.max(pages - 1, 1); i <= pages; i++) {
       newButtons.push(
         <PaginationButtonComponent
-          key={`page-${pages}`}
-          number={pages}
-          className={pages === page ? 'active' : ''}
-          onClick={() => handlePageChange(pages)}
+          key={`page-${i}`}
+          number={i}
+          className={i === page ? 'active' : ''}
+          onClick={() => handlePageChange(i)}
         />,
       );
     }
