@@ -1,6 +1,7 @@
 import styled from 'styled-components';
-import { IProduct } from '../../types.ts';
+import { IProduct } from '../../types/types.ts';
 import { RatingComponent } from '../RatingComponent.tsx';
+import { handleProductPictireError } from '../../utils/helpers.ts';
 
 const StyledProductCard = styled.div`
   display: flex;
@@ -19,16 +20,20 @@ const StyledProductCard = styled.div`
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.15);
   }
 
-  @media (max-width: 1199px) {
+  /* @media (max-width: 1199px) {
     width: 100%;
     max-width: 300px;
     flex-wrap: wrap;
-  }
+  } */
+`;
+
+const StyledPictureWrapper = styled.div`
+  max-width: 250px;
 `;
 
 const StyledPicture = styled.img`
   display: block;
-  max-width: 250px;
+  max-width: 100%;
   overflow: hidden;
   box-sizing: border-box;
   border-radius: 16px 16px 0 0;
@@ -73,7 +78,13 @@ export const ProductCardComponent = ({
 }: ProductCardComponentProps) => {
   return (
     <StyledProductCard key={id} onClick={onClick}>
-      <StyledPicture src={picture} alt={title} />
+      <StyledPictureWrapper>
+        <StyledPicture
+          src={picture}
+          alt={title}
+          onError={handleProductPictireError}
+        />
+      </StyledPictureWrapper>
       <StyledInfo>
         <StyledInfoHeader>
           <StyledTitle>{title}</StyledTitle>

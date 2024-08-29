@@ -5,7 +5,7 @@ import { PlusIconComponent } from '../Icons/PlusIconComponent.tsx';
 import { colors } from '@styles/colors.ts';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useGetCartQuery, useUpdateCartMutation } from '@api//cartApi.ts';
-import { IGetCart } from 'types.ts';
+import { IGetCart } from 'types/types.ts';
 
 const StyledCounterWrapper = styled.div`
   display: flex;
@@ -70,6 +70,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
   const [updateCart] = useUpdateCartMutation();
 
   const [order, setOrder] = useState<IGetCart | undefined>(undefined);
+  const [quantity, setQuantity] = useState(0);
   const [isButtonDisabled, setButtonDisabled] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
 
@@ -170,6 +171,12 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
     }
   }, [totalCost, order]);
 
+  useEffect(() => {
+    if (order) {
+      setQuantity(order.quantity);
+    }
+  }, [totalCost, order]);
+
   return (
     <StyledCounterWrapper>
       <CounterButtonComponent
@@ -179,7 +186,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
       />
       <StyledCounterInput
         type={'number'}
-        value={order?.quantity}
+        value={quantity}
         onChange={handleInputChange}
         onFocus={handleFocus}
         ref={inputRef}

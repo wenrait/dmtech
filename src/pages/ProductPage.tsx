@@ -11,9 +11,10 @@ import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
 import { addNewProduct } from '@slices/cartSlice.ts';
 import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
-import { IOrderInfo } from '../types.ts';
+import { IOrderInfo } from '../types/types.ts';
 import { useGetCartQuery, useUpdateCartMutation } from '@api/cartApi.ts';
 import { useEffect, useState } from 'react';
+import { handleProductPictireError } from '../utils/helpers.ts';
 
 const StyledProductPage = styled.div`
   display: flex;
@@ -228,7 +229,11 @@ export const ProductPage = () => {
       {product && (
         <StyledCardsContainer>
           <StyledInfoCard>
-            <StyledPicture src={product.picture} alt={product.title} />
+            <StyledPicture
+              src={product.picture}
+              alt={product.title}
+              onError={handleProductPictireError}
+            />
             <StyledInfo>
               <StyledInfoBlock>
                 <StyledTitle>{product.title}</StyledTitle>

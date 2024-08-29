@@ -1,8 +1,9 @@
 import styled, { css } from 'styled-components';
-import { colors } from "@styles/colors.ts";
+import { colors } from '@styles/colors.ts';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { IOrderInfo } from 'types.ts';
+import { IOrderInfo } from 'types/types';
+import { handleProductPictireError } from '../../utils/helpers';
 
 const StyledOrderCard = styled.div`
   display: flex;
@@ -119,6 +120,7 @@ export const OrderCardComponent = ({ orderItem }: OrderCardComponentProps) => {
               key={item.product.id}
               src={item.product.picture}
               alt={item.product.title}
+              onError={handleProductPictireError}
             />
           ))}
         </StyledPicturesContainer>

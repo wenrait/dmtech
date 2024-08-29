@@ -91,7 +91,7 @@ export const CartComponent = () => {
         <CartIconComponent />
         <StyledText>Корзина</StyledText>
         <StyledTextCounter>
-          {cartAPI ? cartAPI.length : isLoading}
+          ({cartAPI ? cartAPI.length : isLoading})
         </StyledTextCounter>
       </StyledContainer>
       {widgetVisible && <CartWidget />}

@@ -4,7 +4,7 @@ import {
   IProduct,
   IProductReq,
   IProductsReq,
-} from '../../../types.ts';
+} from '../../../types/types.ts';
 
 export const productsApi = createApi({
   reducerPath: 'productsApi',

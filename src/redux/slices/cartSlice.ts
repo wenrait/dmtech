@@ -1,4 +1,4 @@
-import { IOrderInfo } from '../../types.ts';
+import { IOrderInfo } from '../../types/types.ts';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface CartState {

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useGetCartQuery } from '../../redux/services/api/cartApi.ts';
 import { CounterComponent } from '../Counter/CounterComponent.tsx';
+import { handleProductPictireError } from '../../utils/helpers.ts';
 
 const StyledCartItem = styled.div`
   display: flex;
@@ -66,7 +67,11 @@ export const CartItemComponent = ({ id }: CartItemComponent) => {
     return (
       <StyledCartItem>
         <StyledPictureAndTitle>
-          <StyledPicture src={product.picture} alt={product.title} />
+          <StyledPicture
+            src={product.picture}
+            alt={product.title}
+            onError={handleProductPictireError}
+          />
           <StyledTitle>{product.title}</StyledTitle>
         </StyledPictureAndTitle>
         <CounterComponent id={product.id} />
