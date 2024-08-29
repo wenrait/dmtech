@@ -68,9 +68,10 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
   const { data: cart, refetch } = useGetCartQuery();
   const [updateCart] = useUpdateCartMutation();
 
-  const order = cart?.find((item) => item.product.id === id);
-
-  const [quantity, setQuantity] = useState<number>(order?.quantity);
+  const [order, setOrder] = useState(null);
+  const [isButtonDisabled, setButtonDisabled] = useState(false);
+  const [totalCost, setTotalCost] = useState(0);
+  //const [quantity, setQuantity] = useState(0);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -97,21 +98,9 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
         id: item.product.id,
         quantity: item.quantity,
       }));
-      const newCart = existingCart.map((item) => {
-        if (item.id === id) {
-          const newQuantity = item.quantity + 1;
-          const newTotal = cart.reduce((sum, cartItem) => {
-            return cartItem.id === id
-              ? sum + cartItem.product.price * newQuantity
-              : sum + cartItem.product.price * cartItem.quantity;
-          }, 0);
-
-          if (newTotal <= 10000) {
-            return { ...item, quantity: newQuantity };
-          }
-        }
-        return item;
-      });
+      const newCart = existingCart.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+      );
       await updateCart({ data: newCart });
       refetch();
     } catch (e) {
@@ -127,20 +116,6 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
 
         if (newQuantity > 10) {
           newQuantity = 10;
-        }
-        const currentCartValue = cart
-          .filter((item) => item.product.id !== order?.product.id)
-          .reduce(
-            (total, item) => total + item.quantity * item.product.price,
-            0,
-          );
-
-        const maxQuantity = Math.floor(
-          (10000 - currentCartValue) / order.product.price,
-        );
-
-        if (newQuantity > maxQuantity) {
-          newQuantity = maxQuantity;
         }
 
         const existingCart = cart.map((item) => ({
@@ -167,9 +142,21 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
 
   useEffect(() => {
     if (cart) {
-      setQuantity(cart?.find((order) => order.product.id === id)?.quantity);
+      setOrder(cart.find((item) => item.product.id === id));
+      setTotalCost(
+        cart.reduce((acc, item) => acc + item.quantity * item.product.price, 0),
+      );
     }
-  }, [cart, id]);
+  }, [cart]);
+
+  useEffect(() => {
+    if (order) {
+      const nextTotalCost = totalCost + order.product.price;
+      const exceedsLimit = nextTotalCost > 10000;
+      const exceedsMaxQuantity = order.quantity + 1 > 10;
+      setButtonDisabled(exceedsLimit || exceedsMaxQuantity);
+    }
+  }, [totalCost, order]);
 
   return (
     <StyledCounterWrapper>
@@ -180,7 +167,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
       />
       <StyledCounterInput
         type={'number'}
-        value={quantity}
+        value={order?.quantity}
         onChange={handleInputChange}
         onFocus={handleFocus}
         ref={inputRef}
@@ -189,7 +176,7 @@ export const CounterComponent = ({ id }: CounterComponentProps) => {
         icon={<PlusIconComponent />}
         $function={'increase'}
         onClick={handleIncreaseQuantity}
-        disabled={quantity > 9 || (quantity + 1) * order?.product.price > 10000}
+        disabled={isButtonDisabled}
       />
     </StyledCounterWrapper>
   );

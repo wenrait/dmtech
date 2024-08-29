@@ -9,14 +9,10 @@ import { ButtonComponent } from '../components/Buttons/ButtonComponent.tsx';
 import Undo from '../assets/icons/Undo.svg';
 import { colors } from '../styles/colors.ts';
 import DOMPurify from 'dompurify';
-import { addNewProduct, clearCart } from '@slices/cartSlice.ts';
+import { addNewProduct } from '@slices/cartSlice.ts';
 import { CounterComponent } from '../components/Counter/CounterComponent.tsx';
 import { IOrderInfo } from '../types.ts';
-import {
-  useGetCartQuery,
-  useSubmitCartMutation,
-  useUpdateCartMutation,
-} from '@api/cartApi.ts';
+import { useGetCartQuery, useUpdateCartMutation } from '@api/cartApi.ts';
 import { useEffect, useState } from 'react';
 
 const StyledProductPage = styled.div`
@@ -159,19 +155,12 @@ export const ProductPage = () => {
     isLoading: productIsLoading,
     error: productError,
   } = useGetProductQuery({ id });
-
-  const {
-    data: cart,
-  } = useGetCartQuery();
-
+  const { data: cart } = useGetCartQuery();
   const [updateCart] = useUpdateCartMutation();
-  const [submitCart] = useSubmitCartMutation();
 
   const [isProductInCart, setIsProductInCart] = useState(false);
-
-  useEffect(() => {
-    setIsProductInCart(Boolean(cart?.find((order) => order.product.id === id)));
-  }, [cart]);
+  const [totalCost, setTotalCost] = useState(0);
+  const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   const handleGoBack = () => {
     navigate(`/products?limit=${limit}&page=${page}`);
@@ -179,7 +168,6 @@ export const ProductPage = () => {
 
   const handleAddToCart = async () => {
     try {
-      setIsProductInCart(true);
       const existingCart = cart.map((item) => ({
         id: item.product.id,
         quantity: item.quantity,
@@ -201,14 +189,27 @@ export const ProductPage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      await submitCart(cart);
-      dispatch(clearCart());
-    } catch (e) {
-      console.log(e);
+  useEffect(() => {
+    if (cart) {
+      setTotalCost(
+        cart.reduce((acc, item) => acc + item.quantity * item.product.price, 0),
+      );
     }
-  };
+  }, [cart]);
+
+  useEffect(() => {
+    if (product) {
+      setButtonDisabled(totalCost + product.price > 10000);
+    }
+  }, [totalCost, product]);
+
+  useEffect(() => {
+    if (cart) {
+      setIsProductInCart(
+        Boolean(cart?.find((order) => order.product.id === id)),
+      );
+    }
+  }, [cart]);
 
   return (
     <StyledProductPage>
@@ -238,6 +239,7 @@ export const ProductPage = () => {
                     <ButtonComponent
                       text={'Добавить в корзину'}
                       onClick={() => handleAddToCart()}
+                      disabled={isButtonDisabled}
                     />
                   </StyledComponentWrapper>
                 ) : (
@@ -245,7 +247,7 @@ export const ProductPage = () => {
                     <CounterComponent id={id} />
                     <ButtonComponent
                       text={'Оформить заказ'}
-                      onClick={() => handleSubmit()}
+                      onClick={() => handleGoBack()}
                     />
                   </StyledCounterWrapper>
                 )}
