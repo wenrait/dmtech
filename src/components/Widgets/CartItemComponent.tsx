@@ -9,6 +9,7 @@ import { colors } from '@styles/colors.ts';
 import { LinkButtonComponent } from '@components/Buttons/LinkButtonComponent.tsx';
 import { deleteProduct } from '@redux/slices/cartSlice.ts';
 import { useAppDispatch } from '@redux/store.ts';
+import { useNavigate } from 'react-router-dom';
 
 const StyledCartItem = styled.div`
   display: flex;
@@ -23,6 +24,8 @@ const StyledPictureAndTitle = styled.div`
   display: flex;
   gap: 16px;
   align-items: center;
+
+  cursor: pointer;
 `;
 
 const StyledPicture = styled.img`
@@ -75,6 +78,8 @@ export const CartItemComponent = ({ id }: CartItemComponent) => {
   } = useGetCartQuery();
   const [updateCart] = useUpdateCartMutation();
 
+  const navigate = useNavigate();
+
   const cartItem = cart?.find((item) => item.product.id === id);
 
   if (cartIsLoading) {
@@ -103,11 +108,15 @@ export const CartItemComponent = ({ id }: CartItemComponent) => {
     }
   };
 
+  const handleClick = (id: string) => {
+    navigate(`products/${id}`);
+  };
+
   if (cartItem) {
     const { product } = cartItem;
     return (
       <StyledCartItem>
-        <StyledPictureAndTitle>
+        <StyledPictureAndTitle onClick={() => handleClick(product.id)}>
           <StyledPicture
             src={product.picture}
             alt={product.title}

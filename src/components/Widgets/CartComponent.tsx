@@ -8,7 +8,8 @@ import { CartItemComponent } from './CartItemComponent.tsx';
 import { ButtonComponent } from '../Buttons/ButtonComponent.tsx';
 import { clearCart } from '@slices/cartSlice.ts';
 import { useAppDispatch } from '@redux/store.ts';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { CartNotification } from './CartNotification.tsx';
 
 const StyledCartWidget = styled.div`
   position: absolute;
@@ -57,6 +58,8 @@ export interface CartWidgetProps {
 
 export const CartWidget = ({ setWidgetVisible }: CartWidgetProps) => {
   const dispatch = useAppDispatch();
+  const [notificationVisible, setNotificationVisible] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
 
   const {
     data: cart,
@@ -66,6 +69,13 @@ export const CartWidget = ({ setWidgetVisible }: CartWidgetProps) => {
 
   const [updateCart] = useUpdateCartMutation();
   const [submitCart] = useSubmitCartMutation();
+
+  const showNotification = (message: string) => {
+    setNotificationMessage(message);
+    setNotificationVisible((prev) => !prev);
+
+    setTimeout(() => setNotificationVisible((prev) => !prev), 6000);
+  };
 
   const handleSubmit = async () => {
     try {
@@ -79,7 +89,6 @@ export const CartWidget = ({ setWidgetVisible }: CartWidgetProps) => {
       }));
       const cartWithoutNulls = existingCart.filter((item) => item.quantity > 0);
       await updateCart({ data: cartWithoutNulls });
-      cartRefetch();
 
       if (cartWithoutNulls.length > 0) {
         await submitCart();
@@ -87,8 +96,10 @@ export const CartWidget = ({ setWidgetVisible }: CartWidgetProps) => {
       }
 
       cartRefetch();
+
+      showNotification('Корзина успешно обновлена');
     } catch (e) {
-      console.log(e);
+      showNotification(e as string);
     }
   };
 
@@ -123,6 +134,10 @@ export const CartWidget = ({ setWidgetVisible }: CartWidgetProps) => {
         </StyledButtonWrapper>
       )}
       {cartError && <div>cartError</div>}
+      <CartNotification
+        visible={notificationVisible}
+        message={notificationMessage}
+      />
     </StyledCartWidget>
   );
 };

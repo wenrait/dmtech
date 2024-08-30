@@ -40,6 +40,22 @@ export const OrdersPage = () => {
   const limitUrl = params.get('limit');
   const pageUrl = params.get('page');
 
+  const cartLocal = useSelector((state: RootState) => state.cartReducer.cart);
+
+  const {
+    data: orders,
+    isLoading,
+    refetch: ordersRefetch,
+  } = useGetOrdersQuery({
+    limit,
+    page,
+  });
+
+  useEffect(() => {
+    console.log('REFETCH');
+    ordersRefetch();
+  }, [cartLocal]);
+
   useEffect(() => {
     if (!params.has('limit')) {
       params.set('limit', limit.toString());
@@ -78,15 +94,6 @@ export const OrdersPage = () => {
 
     navigate(`/orders?${params.toString()}`, { replace: true });
   }, [limitUrl, pageUrl, totalPages, dispatch]);
-
-  const { data: orders, isLoading } = useGetOrdersQuery({
-    limit,
-    page,
-  });
-
-  if (orders) {
-    console.log(orders);
-  }
 
   useEffect(() => {
     if (orders) {

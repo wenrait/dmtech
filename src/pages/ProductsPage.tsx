@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useGetProductsQuery } from '@api/productsApi.ts';
 import { ProductCardComponent } from '../components/Widgets/ProductCardComponent.tsx';
 import { PaginationComponent } from '../components/PaginationComponent.tsx';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../redux/store.ts';
-import { setLimit, setPage } from '@slices/paginationSlice.ts';
+import { setLimit, setPage } from '@redux/slices/paginationSlice.ts';
 
 const StyledProductsPage = styled.div`
   display: flex;
@@ -28,6 +28,9 @@ export const ProductsPage = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const params = new URLSearchParams(location.search);
+  const limitUrl = params.get('limit');
+  const pageUrl = params.get('page');
 
   const { limit, page } = useSelector(
     (state: RootState) => state.paginationReducer,
@@ -35,9 +38,16 @@ export const ProductsPage = () => {
 
   const [totalPages, setTotalPages] = useState(0);
 
-  const params = new URLSearchParams(location.search);
-  const limitUrl = params.get('limit');
-  const pageUrl = params.get('page');
+  const { data: products, isLoading } = useGetProductsQuery({
+    limit,
+    page,
+  });
+
+  const pageRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClick = (id: string) => {
+    navigate(`/products/${id}`, { replace: true });
+  };
 
   useEffect(() => {
     if (!params.has('limit')) {
@@ -78,23 +88,14 @@ export const ProductsPage = () => {
     navigate(`/products?${params.toString()}`, { replace: true });
   }, [limitUrl, pageUrl, totalPages, dispatch]);
 
-  const { data: products, isLoading } = useGetProductsQuery({
-    limit,
-    page,
-  });
-
   useEffect(() => {
     if (products) {
       setTotalPages(Math.ceil(products?.meta.total / limit));
     }
   }, [products, limit]);
 
-  const handleClick = (id: string) => {
-    navigate(`/products/${id}`, { replace: true });
-  };
-
   return (
-    <StyledProductsPage>
+    <StyledProductsPage ref={pageRef}>
       <StyledProductsWrapper>
         {isLoading && <div>Loading...</div>}
         {products?.data &&
