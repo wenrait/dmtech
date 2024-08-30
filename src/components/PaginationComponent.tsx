@@ -33,34 +33,19 @@ export const PaginationComponent = ({
   };
 
   useEffect(() => {
-    console.log(params.get('page'));
-  }, [params]);
-
-  useEffect(() => {
     const newButtons: JSX.Element[] = [];
 
-    const startPage = Math.max(1, page - 1);
-    const endPage = Math.min(pages, page + 1);
-
-    for (let i = 1; i <= Math.min(2, pages); i++) {
+    if (pages === 1) {
       newButtons.push(
         <PaginationButtonComponent
-          key={`page-${i}`}
-          number={i}
-          className={i === page ? 'active' : ''}
-          onClick={() => handlePageChange(i)}
+          key={`page-1`}
+          number={1}
+          className={'active'}
+          onClick={() => handlePageChange(1)}
         />,
       );
-    }
-
-    if (startPage > 3) {
-      newButtons.push(
-        <PaginationButtonComponent key="left-ellipsis" number="..." />,
-      );
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      if (i > 2 && i < pages - 1) {
+    } else if (pages === 2) {
+      for (let i = 1; i < 3; i++) {
         newButtons.push(
           <PaginationButtonComponent
             key={`page-${i}`}
@@ -70,23 +55,56 @@ export const PaginationComponent = ({
           />,
         );
       }
-    }
+    } else {
+      const startPage = Math.max(1, page - 1);
+      const endPage = Math.min(pages, page + 1);
 
-    if (endPage < pages - 2) {
-      newButtons.push(
-        <PaginationButtonComponent key="right-ellipsis" number="..." />,
-      );
-    }
+      for (let i = 1; i <= Math.min(2, pages); i++) {
+        newButtons.push(
+          <PaginationButtonComponent
+            key={`page-${i}`}
+            number={i}
+            className={i === page ? 'active' : ''}
+            onClick={() => handlePageChange(i)}
+          />,
+        );
+      }
 
-    for (let i = Math.max(pages - 1, 1); i <= pages; i++) {
-      newButtons.push(
-        <PaginationButtonComponent
-          key={`page-${i}`}
-          number={i}
-          className={i === page ? 'active' : ''}
-          onClick={() => handlePageChange(i)}
-        />,
-      );
+      if (startPage > 3) {
+        newButtons.push(
+          <PaginationButtonComponent key="left-ellipsis" number="..." />,
+        );
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        if (i > 2 && i < pages - 1) {
+          newButtons.push(
+            <PaginationButtonComponent
+              key={`page-${i}`}
+              number={i}
+              className={i === page ? 'active' : ''}
+              onClick={() => handlePageChange(i)}
+            />,
+          );
+        }
+      }
+
+      if (endPage < pages - 2) {
+        newButtons.push(
+          <PaginationButtonComponent key="right-ellipsis" number="..." />,
+        );
+      }
+
+      for (let i = Math.max(pages - 1, 1); i <= pages; i++) {
+        newButtons.push(
+          <PaginationButtonComponent
+            key={`page-${i}`}
+            number={i}
+            className={i === page ? 'active' : ''}
+            onClick={() => handlePageChange(i)}
+          />,
+        );
+      }
     }
 
     setButtons(newButtons);
