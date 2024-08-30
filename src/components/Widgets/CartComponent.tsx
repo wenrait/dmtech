@@ -10,6 +10,7 @@ import { clearCart } from '@slices/cartSlice.ts';
 import { useAppDispatch } from '@redux/store.ts';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { CartNotification } from './CartNotification.tsx';
+import { dividePrice } from '../../utils/helpers.ts';
 
 const StyledCartWidget = styled.div`
   position: absolute;
@@ -120,11 +121,12 @@ export const CartWidget = ({ setWidgetVisible }: CartWidgetProps) => {
         <StyledWrapper>
           <StyledText>Итого</StyledText>
           <StyledPrice>
-            {cart.reduce(
-              (acc, item) => acc + item.quantity * item.product.price,
-              0,
-            )}{' '}
-            ₽
+            {dividePrice(
+              cart.reduce(
+                (acc, item) => acc + item.quantity * item.product.price,
+                0,
+              ),
+            )}
           </StyledPrice>
         </StyledWrapper>
       )}

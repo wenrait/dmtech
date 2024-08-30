@@ -2,7 +2,11 @@ import styled from 'styled-components';
 import { colors } from '@styles/colors.ts';
 import { ReactNode } from 'react';
 
-const StyledPaginationButton = styled.button`
+interface StyledPaginationButtonProps {
+  $dots: boolean;
+}
+
+const StyledPaginationButton = styled.button<StyledPaginationButtonProps>`
   border: 0;
   border-radius: 12px;
   background: ${colors.brand.lighter};
@@ -16,14 +20,16 @@ const StyledPaginationButton = styled.button`
   color: ${colors.brand.default};
 
   transition: 120ms;
-  cursor: pointer;
+  cursor: ${(props: StyledPaginationButtonProps) =>
+    props.$dots ? 'default' : 'pointer'};
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:not(:disabled):hover {
-    background: rgb(213, 227, 241);
+    background: ${(props: StyledPaginationButtonProps) =>
+      props.$dots ? `${colors.brand.lighter}` : `rgb(213, 227, 241)`};
   }
 
   &:not(:disabled):active {
@@ -62,6 +68,7 @@ export interface PaginationButtonProps {
   disabled?: boolean;
   className?: string;
   onClick?: () => void;
+  dots: boolean;
 }
 
 export const PaginationButtonComponent = ({
@@ -70,12 +77,14 @@ export const PaginationButtonComponent = ({
   disabled,
   className,
   onClick,
+  dots,
 }: PaginationButtonProps) => {
   return (
     <StyledPaginationButton
       disabled={disabled}
       className={className}
       onClick={onClick}
+      $dots={dots}
     >
       {number}
       {icon}

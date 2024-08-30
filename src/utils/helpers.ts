@@ -9,8 +9,9 @@ export const handleProductPictireError = (e: SyntheticEvent) => {
 export const dividePrice = (price: number) => {
   const integer = Math.floor(price / 1000);
   const decimal = price % 1000;
+
   if (integer > 0) {
-    return `${integer} ${decimal} ₽`;
+    return `${integer} ${decimal.toString().padStart(3, '0')} ₽`;
   } else {
     return `${price} ₽`;
   }

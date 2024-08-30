@@ -14,7 +14,8 @@ const StyledLinkButton = styled.button<StyledLinkButtonProps>`
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 16px;
-  color: ${(props: StyledLinkButtonProps) => (props.$variant === 'focus' ? colors.focus : colors.brand.default)};
+  color: ${(props: StyledLinkButtonProps) =>
+    props.$variant === 'focus' ? colors.focus : colors.brand.default};
 
   transition: 120ms;
   cursor: pointer;
@@ -26,20 +27,24 @@ const StyledLinkButton = styled.button<StyledLinkButtonProps>`
 
   svg {
     path {
-      fill: ${(props) => (props.$variant === 'focus' ? colors.focus : colors.brand.default)};
+      fill: ${(props) =>
+        props.$variant === 'focus' ? colors.focus : colors.brand.default};
       transition: 120ms;
     }
   }
 
   &:hover {
-    color: ${(props) => (props.$variant === 'focus' ? 'rgb(238, 87, 67)' : 'rgb(55, 143, 242)')};
+    color: ${(props) =>
+      props.$variant === 'focus' ? 'rgb(238, 87, 67)' : 'rgb(55, 143, 242)'};
 
     svg {
       path {
-        fill: ${(props) => (props.$variant === 'focus' ? 'rgb(238, 87, 67)' : 'rgb(55, 143, 242)')};
+        fill: ${(props) =>
+          props.$variant === 'focus'
+            ? 'rgb(238, 87, 67)'
+            : 'rgb(55, 143, 242)'};
       }
     }
-  }
   }
 `;
 

@@ -42,6 +42,7 @@ export const PaginationComponent = ({
           number={1}
           className={'active'}
           onClick={() => handlePageChange(1)}
+          dots={false}
         />,
       );
     } else if (pages === 2) {
@@ -52,6 +53,7 @@ export const PaginationComponent = ({
             number={i}
             className={i === page ? 'active' : ''}
             onClick={() => handlePageChange(i)}
+            dots={false}
           />,
         );
       }
@@ -66,13 +68,18 @@ export const PaginationComponent = ({
             number={i}
             className={i === page ? 'active' : ''}
             onClick={() => handlePageChange(i)}
+            dots={false}
           />,
         );
       }
 
       if (startPage > 3) {
         newButtons.push(
-          <PaginationButtonComponent key="left-ellipsis" number="..." />,
+          <PaginationButtonComponent
+            key="left-ellipsis"
+            number="..."
+            dots={true}
+          />,
         );
       }
 
@@ -84,6 +91,7 @@ export const PaginationComponent = ({
               number={i}
               className={i === page ? 'active' : ''}
               onClick={() => handlePageChange(i)}
+              dots={false}
             />,
           );
         }
@@ -91,7 +99,11 @@ export const PaginationComponent = ({
 
       if (endPage < pages - 2) {
         newButtons.push(
-          <PaginationButtonComponent key="right-ellipsis" number="..." />,
+          <PaginationButtonComponent
+            key="right-ellipsis"
+            number="..."
+            dots={true}
+          />,
         );
       }
 
@@ -102,6 +114,7 @@ export const PaginationComponent = ({
             number={i}
             className={i === page ? 'active' : ''}
             onClick={() => handlePageChange(i)}
+            dots={false}
           />,
         );
       }
@@ -116,12 +129,14 @@ export const PaginationComponent = ({
         icon={<LeftIconComponent />}
         disabled={page === 1}
         onClick={() => handlePageChange(page - 1)}
+        dots={false}
       />
       {buttons}
       <PaginationButtonComponent
         icon={<RightIconComponent />}
         disabled={page === pages}
         onClick={() => handlePageChange(page + 1)}
+        dots={false}
       />
     </PaginationWrapper>
   );
